@@ -1801,6 +1801,19 @@
     var decoys = CUR_BANK.map(function(x){return x[1];}).filter(function(m){return m !== cn;});
     return shuffle(decoys).slice(0,3).concat([cn]);
   }
+  /* 移动端语音解锁：首次触摸/点击后允许自动播放 */
+  function unlockVoice(){
+    if(!('speechSynthesis' in window)) return;
+    try{
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.rate = 1;
+      var v = pickEnVoice(); if(v) u.voice = v;
+      speechSynthesis.speak(u);
+      setTimeout(function(){ speechSynthesis.cancel(); }, 60);
+    }catch(e){}
+  }
+  document.addEventListener('touchstart', unlockVoice, { once:true, passive:true });
+  document.addEventListener('click', unlockVoice, { once:true });
 
   /* ---- 学习流程 ---- */
   function startWordLearning(mode){
