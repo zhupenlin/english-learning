@@ -179,6 +179,22 @@
   .bank-sub{color:var(--ink-soft);font-size:12px;margin-top:2px;white-space:pre-wrap}
   .dim-add{flex:none;width:28px;height:28px;border:1.5px solid var(--line);background:#fff;color:var(--primary);border-radius:8px;font-size:16px;font-weight:600;line-height:1;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center}
   .dim-add:hover{border-color:var(--primary);background:var(--primary-soft)}
+  .t-form{background:#F7F9FF;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+  .t-form textarea{width:100%;min-height:54px;border:1.5px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13px;font-family:inherit;color:var(--ink);background:#FBFCFE;outline:none;resize:vertical;line-height:1.5;margin-top:10px}
+  .t-form textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(74,108,247,.12)}
+  .t-form select,.t-form input{border:1.5px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;outline:none;cursor:pointer;transition:.2s}
+  .t-form select:focus,.t-form input:focus{border-color:var(--primary)}
+  .task-sec{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+  .task-sec-h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .task-sec-h .badge{font-size:11px;color:var(--primary);background:var(--primary-soft);border-radius:20px;padding:1px 9px;font-weight:600}
+  .task-item{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#FBFCFE;margin-top:8px}
+  .task-item b{color:var(--primary);font-size:14px}
+  .task-item p{font-size:12.5px;color:var(--ink-soft);margin-top:5px;line-height:1.6;white-space:pre-wrap}
+  .task-item .go{float:right;margin-left:8px;border:1.5px solid var(--primary);background:var(--primary-soft);color:var(--primary);border-radius:8px;padding:4px 12px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s}
+  .task-item .go:hover{background:#dce6ff}
+  .task-item .go.del{border-color:var(--danger);color:var(--danger);background:#fff}
+  .task-item .go.del:hover{background:#FDEAE9}
+  .t-empty{font-size:12.5px;color:var(--ink-soft);padding:4px 0;line-height:1.6}
   .admin-note{margin-top:14px;font-size:12.5px;color:var(--ink-soft);background:#F7F9FF;border:1px dashed var(--line);border-radius:10px;padding:8px 11px;line-height:1.6}
 
   /* ===== 学习板块页 ===== */
@@ -207,7 +223,7 @@
   .study-body{flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 22px 16px;width:100%;max-width:1320px;margin:0 auto}
   .zone-grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:16px}
   .zone{
-    background:rgba(255,255,255,.74);border:1px solid var(--line);border-radius:18px;padding:18px 20px;min-height:0;cursor:pointer;
+    background:rgba(255,255,255,.74);border:1px solid var(--line);border-radius:18px;padding:18px 20px;min-height:0;cursor:default;
     display:flex;flex-direction:column;gap:12px;transition:.22s;box-shadow:0 6px 18px rgba(70,90,180,.06);overflow:hidden;position:relative;
   }
   .zone:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(70,90,180,.12);border-color:var(--ac,#4A6CF7)}
@@ -217,17 +233,15 @@
   .zone-tit{flex:1;min-width:0}
   .zone-tit b{display:block;font-size:16px;font-weight:700}
   .zone-tit span{font-size:12px;color:var(--ink-soft)}
-  .zone .chev{color:var(--ink-soft);transition:transform .25s;flex:none}
-  .zone.open .chev{transform:rotate(180deg)}
+  .zone .chev{color:var(--ink-soft);flex:none;display:none}
   .zone-desc{font-size:12.5px;color:var(--ink-soft);line-height:1.5;flex:none}
-  .zone-subs{max-height:0;opacity:0;overflow:hidden;transition:max-height .35s ease,opacity .25s ease;display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:10px;margin-top:auto}
-  .zone.open .zone-subs{max-height:220px;opacity:1}
+  .zone-subs{max-height:none;opacity:1;display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:10px;margin-top:auto}
   .zone .sub{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
     border:1px solid color-mix(in srgb,var(--ac,#4A6CF7) 32%, transparent);color:var(--ac,#4A6CF7);background:#fff;
-    border-radius:10px;padding:14px 8px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;min-width:0;
+    border-radius:14px;padding:18px 8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;min-width:0;
   }
-  .zone .sub svg{width:24px;height:24px;opacity:.85}
+  .zone .sub svg{width:34px;height:34px;opacity:.9}
   .zone .sub:hover{background:color-mix(in srgb,var(--ac,#4A6CF7) 10%, #fff);transform:translateY(-2px);box-shadow:0 6px 14px rgba(70,90,180,.10)}
   @media (max-width:700px){
     .zone{padding:12px 14px}
@@ -235,6 +249,9 @@
     .zone .mic svg{width:20px;height:20px}
     .zone-tit b{font-size:14px}
     .zone-desc{font-size:11.5px}
+    .zone-subs{gap:8px}
+    .zone .sub{padding:12px 6px;font-size:13px;border-radius:12px}
+    .zone .sub svg{width:28px;height:28px}
   }
 
   /* ===== 单词认知 / 单元测试 学习页 ===== */
@@ -578,6 +595,51 @@
   </div>
 </div>
 
+<!-- ===== 教师后台（布置今日任务，仅教师） ===== -->
+<div class="learn" id="teacher-page">
+  <header class="learn-head">
+    <button class="back" onclick="backToLoginFromTeacher()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      返回登录
+    </button>
+    <div class="t">教师后台 · 布置任务</div>
+    <div class="info">
+      <button class="submit-btn" onclick="enterStudy()">预览学生端</button>
+    </div>
+  </header>
+  <div class="admin-body">
+    <div class="unit-bar" style="margin-bottom:12px">
+      <label>布置给学生</label>
+      <select id="t-stu"></select>
+      <span class="bank-tip">为所选学生布置今日任务</span>
+    </div>
+    <div class="imp-tabs">
+      <button class="imp-tab active" data-k="review" onclick="tNav('review')">复习任务</button>
+      <button class="imp-tab" data-k="sync" onclick="tNav('sync')">同步学习</button>
+      <button class="imp-tab" data-k="expand" onclick="tNav('expand')">巩固拓展</button>
+      <button class="imp-tab" data-k="test" onclick="tNav('test')">学后测试</button>
+    </div>
+    <div class="t-form">
+      <div class="bank-filter" style="margin:0">
+        <label>标题</label>
+        <input id="t-title" type="text" placeholder="如：复习第2单元单词" style="flex:1;min-width:160px">
+      </div>
+      <div class="bank-filter" style="margin:0">
+        <label>教材</label><select id="t-ver"></select>
+        <label>年级</label><select id="t-grade"></select>
+        <label>单元</label><select id="t-unit"></select>
+        <label>板块</label><select id="t-module"></select>
+      </div>
+      <textarea id="t-note" spellcheck="false" placeholder="任务说明（可选）"></textarea>
+      <div class="imp-actions" style="margin-top:12px">
+        <button class="copy-ok" onclick="tAssign()">布置此任务</button>
+      </div>
+    </div>
+    <div class="admin-note" id="t-summary" style="margin-top:12px"></div>
+    <div id="t-list" style="display:flex;flex-direction:column;gap:4px;margin-top:12px"></div>
+  </div>
+</div>
+
 <!-- ===== 导入错误查看与删除（校长端） ===== -->
 <div class="modal" id="err-modal">
   <div class="modal-mask" onclick="closeErrModal()"></div>
@@ -650,6 +712,16 @@
     <button class="close" onclick="closeContent()" aria-label="关闭">&times;</button>
     <div class="modal-title" id="content-title">同步语法</div>
     <div id="content-list"></div>
+  </div>
+</div>
+
+<!-- ===== 今日任务（学生端） ===== -->
+<div class="modal" id="task-modal">
+  <div class="modal-mask" onclick="closeTaskModal()"></div>
+  <div class="modal-box content-box">
+    <button class="close" onclick="closeTaskModal()" aria-label="关闭">&times;</button>
+    <div class="modal-title">今日任务</div>
+    <div id="task-list"></div>
   </div>
 </div>
 
@@ -1327,13 +1399,7 @@
         '<div class="zone-subs">' +
           z.subs.map(function(s){ return '<button class="sub" data-fn="' + s[1] + '" data-name="' + s[0] + '">' + (SUB_ICONS[s[0]] || '') + '<span>' + s[0] + '</span></button>'; }).join('') +
         '</div>';
-      // 点击区域 → 展开/收起（手风琴：同一时间只展开一个）
-      card.addEventListener('click', function(e){
-        if(e.target.closest('.sub')) return;
-        var wasOpen = card.classList.contains('open');
-        grid.querySelectorAll('.zone.open').forEach(function(c){ c.classList.remove('open'); });
-        if(!wasOpen){ card.classList.add('open'); }
-      });
+      // 子功能常显示：学习区卡片本身不再响应展开点击
       card.querySelectorAll('.sub').forEach(function(b){
         b.addEventListener('click', function(e){
           e.stopPropagation();
@@ -1349,9 +1415,131 @@
   document.querySelectorAll('.hdr-ic').forEach(function(b){
     b.addEventListener('click', function(){
       if(b.dataset.fn === '内容管理'){ if(ROLE === '校长'){ showAdminPage(); } else { toast('仅校长可管理内容', 'err'); } return; }
+      if(b.dataset.fn === '今日任务'){ openTaskModal(); return; }
       toast('「' + b.dataset.fn + '」功能待细化', 'ok');
     });
   });
+
+  /* ===================== 今日任务（教师布置 + 学生查看） ===================== */
+  var ROLE_ACCOUNT = 'student1';
+  var TASK_KINDS = { review:'复习任务', sync:'同步学习', expand:'巩固拓展', test:'学后测试' };
+  var TASK_ORDER = ['review','sync','expand','test'];
+  var TASK_MODULES = [['单词认知','recog'],['单词听读','listen'],['单词抄默','copy'],['句子认知','srecog'],['句子听读','slisten'],['句子抄默','scopy'],['同步课文','text'],['同步语法','grammar']];
+  var CUR_TASK_KIND = 'review';
+  function taskKey(acc){ return 'english_tasks_' + acc; }
+  function readTasks(acc){ try{ var x = JSON.parse(localStorage.getItem(taskKey(acc)) || 'null'); return (x && x.length) ? x : []; }catch(e){ return []; } }
+  function writeTasks(acc, arr){ try{ localStorage.setItem(taskKey(acc), JSON.stringify(arr)); }catch(e){} }
+  function studentsList(){
+    var list = ['student1'];
+    try{ var us = JSON.parse(localStorage.getItem('english_users') || '[]'); us.forEach(function(u){ if(u.role === '学生' && list.indexOf(u.account) < 0) list.push(u.account); }); }catch(e){}
+    return list;
+  }
+  /* ---- 教师后台 ---- */
+  function showTeacherPage(){
+    $('card').classList.add('hidden');
+    $('study-page').classList.remove('active');
+    ['view-word','view-copy','view-test'].forEach(function(id){ var el = $(id); if(el) el.classList.remove('active'); });
+    $('teacher-page').classList.add('active');
+    fillOptions($('t-stu'), studentsList());
+    fillOptions($('t-ver'), getVersions());
+    fillOptions($('t-grade'), getGrades());
+    $('t-ver').value = getVersions()[0];
+    $('t-grade').value = getGrades()[0];
+    fillTeacherUnit();
+    fillTeacherModule();
+    tNav(CUR_TASK_KIND);
+  }
+  function backToLoginFromTeacher(){ $('teacher-page').classList.remove('active'); $('card').classList.remove('hidden'); }
+  function fillTeacherUnit(){
+    var n = unitCount($('t-grade').value || '小学三年级');
+    var arr = [];
+    for(var i = 1; i <= n; i++){ arr.push('第' + i + '单元'); }
+    fillOptions($('t-unit'), arr);
+  }
+  function fillTeacherModule(){ fillOptions($('t-module'), TASK_MODULES.map(function(m){ return m[0]; })); }
+  $('t-grade').addEventListener('change', function(){ $('t-unit').dataset.grade = this.value; fillTeacherUnit(); });
+  $('t-stu').addEventListener('change', renderTeacherList);
+  function tNav(k){
+    CUR_TASK_KIND = k;
+    document.querySelectorAll('#teacher-page .imp-tab').forEach(function(b){ b.classList.toggle('active', b.dataset.k === k); });
+    renderTeacherList();
+  }
+  function tAssign(){
+    var acc = $('t-stu').value;
+    var title = $('t-title').value.trim();
+    if(!acc){ toast('请先选择学生', 'err'); return; }
+    if(!title){ toast('请填写任务标题', 'err'); return; }
+    var ver = $('t-ver').value, grade = $('t-grade').value, unit = $('t-unit').value;
+    var mod = TASK_MODULES[$('t-module').selectedIndex] || TASK_MODULES[0];
+    var note = $('t-note').value.trim();
+    var tasks = readTasks(acc);
+    tasks.unshift({ id: Date.now(), kind: CUR_TASK_KIND, title: title, ver: ver, grade: grade, unit: unit, name: mod[0], fn: mod[1], note: note, time: new Date().toLocaleString('zh-CN') });
+    writeTasks(acc, tasks);
+    toast('已为学生「' + acc + '」布置「' + TASK_KINDS[CUR_TASK_KIND] + '」', 'ok');
+    $('t-title').value = ''; $('t-note').value = '';
+    renderTeacherList();
+  }
+  function deleteTask(id){
+    var acc = $('t-stu').value;
+    var tasks = readTasks(acc).filter(function(t){ return t.id !== id; });
+    writeTasks(acc, tasks);
+    toast('已删除该任务', 'ok');
+    renderTeacherList();
+  }
+  function renderTeacherList(){
+    var acc = $('t-stu').value;
+    var tasks = readTasks(acc);
+    var h = '<div class="bank-head">学生 ' + escHtml(acc) + ' · 已布置任务</div><p class="t-empty">共 ' + tasks.length + ' 条</p>';
+    TASK_ORDER.forEach(function(k){
+      var list = tasks.filter(function(t){ return t.kind === k; });
+      h += '<div class="task-sec" style="margin-top:10px"><div class="task-sec-h">' + TASK_KINDS[k] + ' <span class="badge">' + list.length + '</span></div>';
+      if(!list.length){ h += '<p class="t-empty">暂无任务</p>'; }
+      list.forEach(function(t){
+        h += '<div class="task-item"><button class="go del" onclick="deleteTask(' + t.id + ')">删除</button><b>' + escHtml(t.title) + '</b><p>教材 ' + escHtml(t.ver) + ' · ' + escHtml(t.grade) + ' · ' + escHtml(t.unit) + ' ｜板块 ' + escHtml(t.name) + (t.note ? '\n说明：' + escHtml(t.note) : '') + '\n布置于 ' + escHtml(t.time) + '</p></div>';
+      });
+      h += '</div>';
+    });
+    $('t-list').innerHTML = h;
+    $('t-summary').textContent = '当前为「' + escHtml(acc) + '」共布置 ' + tasks.length + ' 条任务，学生登录后在「今日任务」中查看并学习。';
+  }
+  /* ---- 学生端今日任务 ---- */
+  function openTaskModal(){
+    var acc = ROLE_ACCOUNT || 'student1';
+    var tasks = readTasks(acc);
+    var h = '';
+    if(!tasks.length){
+      h = '<div class="admin-empty" style="min-height:120px"><b>今日暂无任务</b><p>教师还没有给你布置任务，先去学习板块自主学习吧。</p></div>';
+    } else {
+      TASK_ORDER.forEach(function(k){
+        var list = tasks.filter(function(t){ return t.kind === k; });
+        h += '<div class="task-sec" style="margin-top:10px"><div class="task-sec-h">' + TASK_KINDS[k] + ' <span class="badge">' + list.length + '</span></div>';
+        if(!list.length){ h += '<p class="t-empty">暂无任务</p>'; }
+        list.forEach(function(t){
+          h += '<div class="task-item"><button class="go" onclick="goTask(' + t.id + ')">去学习</button><b>' + escHtml(t.title) + '</b><p>' + escHtml(t.ver) + ' · ' + escHtml(t.grade) + ' · ' + escHtml(t.unit) + (t.note ? '\n说明：' + escHtml(t.note) : '') + '</p></div>';
+        });
+        h += '</div>';
+      });
+    }
+    $('task-list').innerHTML = h;
+    $('task-modal').classList.add('open');
+  }
+  function closeTaskModal(){ $('task-modal').classList.remove('open'); }
+  function findTaskById(acc, id){ var a = readTasks(acc).filter(function(t){ return t.id === id; }); return a.length ? a[0] : null; }
+  function goTask(id){
+    var acc = ROLE_ACCOUNT || 'student1';
+    var t = findTaskById(acc, id);
+    if(!t){ toast('任务不存在或已被删除', 'err'); return; }
+    closeTaskModal();
+    CUR_VER = t.ver; CUR_GRADE = t.grade;
+    $('study-ver-sel').value = t.ver;
+    $('study-grade-sel').value = t.grade;
+    $('study-unit-sel').dataset.grade = t.grade;
+    rebuildUnits();
+    $('study-unit-sel').value = t.unit;
+    updateSummary();
+    if(!$('study-page').classList.contains('active')){ $('card').classList.add('hidden'); $('study-page').classList.add('active'); }
+    enterModule(t.fn, t.name);
+  }
 
   /* ===================== 校长内容管理（按 教材·年级 维度） ===================== */
   var IMPORT_KIND = 'words';
@@ -1682,11 +1870,15 @@
     if(!p){ toast('请输入密码', 'err'); return; }
     var demo = { student1:'学生', teacher1:'教师', principal1:'校长' };
     if(demo[a] && p === '123456'){
-      ROLE = demo[a];
+      ROLE = demo[a]; ROLE_ACCOUNT = a;
       document.querySelectorAll('.tabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.role === ROLE); });
       toast(ROLE + '登录成功，欢迎回来！', 'ok');
       if(ROLE === '校长'){
         setTimeout(function(){ showAdminPage(); toast('进入校长内容管理平台，可录入词汇/句子/语法/课文', 'ok'); }, 500);
+        return;
+      }
+      if(ROLE === '教师'){
+        setTimeout(function(){ showTeacherPage(); toast('进入教师后台，可给学生布置今日任务', 'ok'); }, 500);
         return;
       }
       var saved = loadSelection();
