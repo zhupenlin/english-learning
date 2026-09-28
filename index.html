@@ -1780,7 +1780,7 @@
     if(!('speechSynthesis' in window)) return null;
     var vs = speechSynthesis.getVoices();
     if(!vs || !vs.length) return null;
-    return vs.filter(function(v){ return /en(-|_)/i.test(v.lang); })[0] || vs[0] || null;
+    return vs.filter(function(v){ return /en(-|_)/i.test(v.lang); })[0] || null;
   }
   function speakText(text, done){
     if(!('speechSynthesis' in window)){ if(done) done(); return; }
@@ -1789,6 +1789,10 @@
       var u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US'; u.rate = LEARN.rate;
       var v = pickEnVoice(); if(v) u.voice = v;
+      else if(!window.__enVoiceWarned){
+        window.__enVoiceWarned = true;
+        setTimeout(function(){ toast('当前浏览器未安装英文语音，请在系统/浏览器设置中添加英语语音包后刷新重试', 'err'); }, 300);
+      }
       if(done){ u.onend = done; u.onerror = done; }
       speechSynthesis.speak(u);
     }catch(e){ if(done) done(); }
