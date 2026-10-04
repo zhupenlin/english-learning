@@ -253,6 +253,13 @@
   }
   .zone .sub svg{width:38px;height:38px;opacity:.9}
   .zone .sub:hover{background:color-mix(in srgb,var(--ac,#5FA961) 10%, #fff);transform:translateY(-2px);box-shadow:0 8px 18px rgba(95,169,97,.12)}
+  #alpha-grid .sub{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+    border:1.5px solid color-mix(in srgb,var(--ac,#5FA961) 32%, transparent);color:var(--ac,#5FA961);background:#fff;
+    border-radius:16px;padding:20px 10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;min-width:0;
+  }
+  #alpha-grid .sub svg{width:34px;height:34px;opacity:.9}
+  #alpha-grid .sub:hover{background:color-mix(in srgb,var(--ac,#5FA961) 10%, #fff);transform:translateY(-2px);box-shadow:0 8px 18px rgba(95,169,97,.12)}
   @media (max-width:700px){
     .zone{padding:12px 14px}
     .zone .mic{width:38px;height:38px;border-radius:12px}
