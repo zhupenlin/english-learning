@@ -1224,6 +1224,16 @@
   </div>
 </div>
 
+<!-- ===== 字母学习二级菜单（学生端） ===== -->
+<div class="modal" id="alpha-modal">
+  <div class="modal-mask" onclick="$('alpha-modal').classList.remove('open')"></div>
+  <div class="modal-box content-box" style="max-width:520px">
+    <button class="close" onclick="$('alpha-modal').classList.remove('open')" aria-label="关闭">&times;</button>
+    <div class="modal-title">字母学习</div>
+    <div id="alpha-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px"></div>
+  </div>
+</div>
+
 <!-- ===== 查看已录入素材（校长端，按 教材·年级 检索） ===== -->
 <div class="modal" id="bank-modal">
   <div class="modal-mask" onclick="closeBanks()"></div>
@@ -1747,25 +1757,30 @@
       subs:[['字母学习','alpha'],['音标学习','phonic']] },
     { name:'词汇学习区', tag:'词汇突破', desc:'认读 · 听音 · 抄默，多维记忆单元生词', ac:'#2FB3A0',
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
-      subs:[['单词认知','recog'],['单词听读','listen'],['单词抄默','copy'],['单词读说','read']] },
-    { name:'句子学习区', tag:'句子应用', desc:'认识 · 听读 · 抄默，掌握单元重点句型', ac:'#3BB0E6',
+      subs:[['单词认知','recog'],['单词听知','listen'],['单词抄默','copy'],['单词读说','read']] },
+    { name:'句子学习区', tag:'句子应用', desc:'认识 · 听知 · 抄默，掌握单元重点句型', ac:'#3BB0E6',
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-      subs:[['句子认知','srecog'],['句子听读','slisten'],['句子抄默','scopy'],['句子读说','sread']] },
+      subs:[['句子认知','srecog'],['句子听知','slisten'],['句子抄默','scopy'],['句子读说','sread']] },
     { name:'同步拓展区', tag:'同步提升', desc:'同步课文 · 语法 · 试卷，巩固单元知识', ac:'#E8934A',
       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 5h20"/><path d="M6 5v14"/><path d="M12 5v14"/><path d="M18 5v14"/><path d="M3 19h18"/></svg>',
       subs:[['同步课文','text'],['同步语法','grammar'],['同步试卷','exam']] }
   ];
   var SUB_ICONS = {
     '字母学习':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v12"/><path d="M8 8h6"/><path d="M8 12h6"/><path d="M20 17a2 2 0 0 1-2 2H4"/></svg>',
+    '字母认知':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+    '字母听知':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>',
+    '字母抄写':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
+    '字母读说':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v3"/></svg>',
+    '字母测试':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>',
     '音标学习':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
     '单词认知':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
-    '单词听读':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>',
+    '单词听知':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>',
     '单词抄默':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
     '单词跟读':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v3"/></svg>',
     '单词读说':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v3"/></svg>',
     '句子读说':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v3"/></svg>',
     '句子认知':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-    '句子听读':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+    '句子听知':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
     '句子抄默':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>',
     '同步课文':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
     '同步语法':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20"/><path d="M6 5v14"/><path d="M12 5v14"/><path d="M18 5v14"/><path d="M3 19h18"/></svg>',
@@ -1998,7 +2013,14 @@
   }
   function ttReplay(){ TT.idx = 0; TT.restore = {idx:0, blank:'', count:0, timeLeft:20, timerInt:null}; ttNav('restore'); }
 
+  function openAlphaMenu(){
+    var subs=[['字母认知','arecog'],['字母听知','alisten'],['字母抄写','acopy'],['字母读说','aread'],['字母测试','atest']];
+    $('alpha-grid').innerHTML = subs.map(function(s){ return '<button class="sub" data-fn="'+s[1]+'" data-name="'+s[0]+'">'+(SUB_ICONS[s[0]]||'')+'<span>'+s[0]+'</span></button>'; }).join('');
+    $('alpha-grid').querySelectorAll('.sub').forEach(function(b){ b.addEventListener('click', function(){ $('alpha-modal').classList.remove('open'); enterModule(b.dataset.fn, b.dataset.name); }); });
+    $('alpha-modal').classList.add('open');
+  }
   function enterModule(fn, name){
+    if(fn === 'alpha'){ openAlphaMenu(); return; }
     if(fn === 'recog'){ startWordLearning('recog'); }
     else if(fn === 'listen'){ startWordLearning('listen'); }
     else if(fn === 'copy'){ startWordCopy(); }
@@ -2054,7 +2076,7 @@
   var ROLE_ACCOUNT = 'student1';
   var TASK_KINDS = { review:'复习任务', sync:'同步学习', expand:'巩固拓展', test:'学后测试' };
   var TASK_ORDER = ['review','sync','expand','test'];
-  var TASK_MODULES = [['单词认知','recog'],['单词听读','listen'],['单词抄默','copy'],['单词读说','read'],['句子认知','srecog'],['句子听读','slisten'],['句子抄默','scopy'],['句子读说','sread'],['同步课文','text'],['同步语法','grammar']];
+  var TASK_MODULES = [['单词认知','recog'],['单词听知','listen'],['单词抄默','copy'],['单词读说','read'],['句子认知','srecog'],['句子听知','slisten'],['句子抄默','scopy'],['句子读说','sread'],['同步课文','text'],['同步语法','grammar']];
   var CUR_TASK_KIND = 'review';
   function taskKey(acc){ return 'english_tasks_' + acc; }
   function readTasks(acc){ try{ var x = JSON.parse(localStorage.getItem(taskKey(acc)) || 'null'); return (x && x.length) ? x : []; }catch(e){ return []; } }
@@ -2106,7 +2128,7 @@
   }
   /* ---- 学习记录数据模型 ----
      english_learn_{account} = { modules:{mode:{n,ok}}, tests:[{mode,score,time}], review:{word:{stage,due}} } */
-  var MODE_NAMES = { recog:'单词认知', listen:'单词听读', copy:'单词抄默', read:'单词读说', srecog:'句子认知', slisten:'句子听读', scopy:'句子抄默', sread:'句子读说' };
+  var MODE_NAMES = { recog:'单词认知', listen:'单词听知', copy:'单词抄默', read:'单词读说', srecog:'句子认知', slisten:'句子听知', scopy:'句子抄默', sread:'句子读说' };
   function readLearn(acc){
     try{ var d = JSON.parse(localStorage.getItem('english_learn_' + acc) || 'null'); return (d && typeof d === 'object') ? d : {}; }catch(e){ return {}; }
   }
@@ -3542,7 +3564,7 @@
     var isSent = MODE === 'srecog' || MODE === 'slisten';
     var isListen = MODE === 'listen' || MODE === 'slisten';
     CUR_BANK = isSent ? bankSents() : bankWords();
-    var title = MODE === 'srecog' ? '句子认知' : (MODE === 'slisten' ? '句子听读' : (MODE === 'listen' ? '单词听读' : '单词认知'));
+    var title = MODE === 'srecog' ? '句子认知' : (MODE === 'slisten' ? '句子听知' : (MODE === 'listen' ? '单词听知' : '单词认知'));
     $('word-mode-title').textContent = title;
     $('word-en').style.display = isListen ? 'none' : 'block';
     $('word-ph').style.display = isSent ? 'none' : (isListen ? 'none' : 'block');
@@ -3828,7 +3850,7 @@
     TEST.correct = 0; TEST.wrongPool = []; TEST.submitted = false;
     var SECS = { listen:18, copy:14, slisten:26, scopy:30, srecog:20 };
     $('test-mode').textContent = mode === 'wrong' ? '错题重测' : '全卷';
-    var TITLE = { recog:'单元测试', listen:'单元听读测试', copy:'单元默写测试', srecog:'句子认知测试', slisten:'句子听读测试', scopy:'句子默写测试' };
+    var TITLE = { recog:'单元测试', listen:'单元听知测试', copy:'单元默写测试', srecog:'句子认知测试', slisten:'句子听知测试', scopy:'句子默写测试' };
     $('test-title').textContent = TITLE[MODE] || '单元测试';
     $('view-word').classList.remove('active');
     $('view-copy').classList.remove('active');
