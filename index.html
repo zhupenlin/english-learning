@@ -898,6 +898,16 @@
   </div>
 </div>
 
+<!-- ===== 字母学习二级菜单（body 顶层，在 teacher-page 之前） ===== -->
+<div class="modal" id="alpha-modal">
+  <div class="modal-mask" onclick="$('alpha-modal').classList.remove('open')"></div>
+  <div class="modal-box content-box" style="max-width:520px">
+    <button class="close" onclick="$('alpha-modal').classList.remove('open')" aria-label="关闭">&times;</button>
+    <div class="modal-title">字母学习</div>
+    <div id="alpha-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px"></div>
+  </div>
+</div>
+
 <!-- ===== 教师后台（仅教师） ===== -->
 <div class="learn" id="teacher-page">
   <header class="learn-head">
@@ -1221,16 +1231,6 @@
       <button class="copy-ok" onclick="deleteErrRows()">删除这些错误内容</button>
       <button class="copy-ok sec" onclick="closeErrModal()">取消</button>
     </div>
-  </div>
-</div>
-
-<!-- ===== 字母学习二级菜单（学生端） ===== -->
-<div class="modal" id="alpha-modal">
-  <div class="modal-mask" onclick="$('alpha-modal').classList.remove('open')"></div>
-  <div class="modal-box content-box" style="max-width:520px">
-    <button class="close" onclick="$('alpha-modal').classList.remove('open')" aria-label="关闭">&times;</button>
-    <div class="modal-title">字母学习</div>
-    <div id="alpha-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px"></div>
   </div>
 </div>
 
