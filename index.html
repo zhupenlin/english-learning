@@ -5092,14 +5092,21 @@
     // 结束跟读 → 隐藏跟读按钮，先自动上传评测；「播放我的录音」等评测结果（对比读音）时再显示
     $('read-mic').style.display = 'none';
     var pl = $('read-play'); if(pl) pl.style.display = 'none';
-    // 读完自动给分
+    // 用浏览器自带语音识别自动对比
     setTimeout(function(){
-      if(READ.lastBlob){
-        gradeScore(80);
-      } else {
-        gradeScore(0);
+      var w = READ.words[READ.idx];
+      var spoken = (READ.finalText || '').toLowerCase().trim();
+      var target = w.word.toLowerCase().trim();
+      if(!spoken){
+        gradeScore(50);
+        return;
       }
-    }, 800);
+      if(spoken === target || spoken.indexOf(target) >= 0 || target.indexOf(spoken) >= 0){
+        gradeScore(100);
+      } else {
+        gradeScore(40);
+      }
+    }, 1500);
   }
   // 讯飞语音评测（直连WebSocket）
   var ISE_APPID = '6e148968';
