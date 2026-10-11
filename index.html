@@ -115,6 +115,10 @@
   .modal-title{font-size:18px;font-weight:600;text-align:center;margin-bottom:22px;letter-spacing:1px}
   .modal .close{position:absolute;right:16px;top:14px;border:0;background:none;font-size:23px;color:#A4AECA;cursor:pointer;line-height:1;padding:2px}
   .modal .close:hover{color:var(--ink)}
+  /* 今日任务：全屏展示 */
+  #task-modal{padding:0;align-items:stretch;justify-content:stretch}
+  #task-modal .modal-box{width:100%;max-width:none;height:100vh;min-height:100vh;border-radius:0;padding:32px 28px;overflow-y:auto;transform:none}
+  #task-modal .modal-title{text-align:left;font-size:24px;margin-bottom:18px}
   .modal .field{margin-bottom:16px}
   .modal select{
     width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14.5px;
@@ -366,6 +370,7 @@
   .demo-btn{position:fixed;right:16px;bottom:16px;border:1px dashed var(--primary);background:#fff;color:var(--primary);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit}
   .test-note{font-size:13px;color:var(--ink-soft);margin-top:14px}
   .result-score{font-size:40px;font-weight:700;color:var(--primary)}
+  #test-result{margin:20px auto 0}
   .result-msg{font-size:14px;color:var(--ink-soft);margin:10px 0 20px;line-height:1.6}
   .result-btns{display:flex;gap:10px;justify-content:center}
   .result-btns .btn{width:auto;padding:12px 22px;letter-spacing:1px}
@@ -484,7 +489,11 @@
   .task-grid .gok{display:inline-block;background:#e7f7ec;color:#17884b;padding:2px 9px;border-radius:999px;font-weight:700}
   .task-grid .gno{color:#c6ccd8}
 
-  .task-grid td.ccell{cursor:pointer}
+  .task-grid td.ccell{cursor:pointer;position:relative}
+  .task-grid .cell-ops{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#fff;border-radius:12px;box-shadow:0 10px 28px rgba(50,70,50,.2);padding:6px;z-index:30;white-space:nowrap;border:1px solid var(--line)}
+  .task-grid td.ccell:hover .cell-ops{display:block}
+  .task-grid .cell-ops button{display:block;width:100%;border:0;background:none;padding:7px 16px;font-size:13px;cursor:pointer;text-align:left;border-radius:8px;color:var(--ink)}
+  .task-grid .cell-ops button:hover{background:#eef6ee;color:var(--primary-dark)}
   .task-grid td.ccell:hover{background:#f4f7ff}
   .task-grid .st-ok{display:inline-block;color:#fff;background:#1a9e55;width:22px;height:22px;line-height:22px;border-radius:50%;font-weight:700}
   .task-grid .st-part{display:inline-block;color:#fff;background:#f0a13b;width:22px;height:22px;line-height:22px;border-radius:50%;font-weight:700}
@@ -922,7 +931,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       返回登录
     </button>
-    <div class="t">教师后台</div>
+    <div class="t">学管后台</div>
     <div class="info">
       <button class="submit-btn" onclick="enterStudy()">预览学生端</button>
     </div>
@@ -969,7 +978,7 @@
         <div><label style="display:block;font-size:12px;color:var(--ink);margin-bottom:4px">就读学校</label><input id="mm-school" placeholder="就读学校（可空）" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none"></div>
         <div><label style="display:block;font-size:12px;color:var(--ink);margin-bottom:4px">年级</label><input id="mm-grade" placeholder="年级（如：三年级）" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none"></div>
         <div><label style="display:block;font-size:12px;color:var(--ink);margin-bottom:4px">到期日期</label><input id="mm-expire" type="date" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none"></div>
-        <div><label style="display:block;font-size:12px;color:var(--ink);margin-bottom:4px">总金币数</label><input id="mm-coins" type="number" min="0" placeholder="0" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none"></div>
+        <div><label style="display:block;font-size:12px;color:var(--ink);margin-bottom:4px">密码设置</label><input id="mm-pwd" type="password" placeholder="留空则保持原密码" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;outline:none"></div>
       </div>
       <div class="imp-actions"><button class="copy-ok" onclick="saveMemberModal()">保存</button><button class="go" onclick="closeMemberModal()">取消</button></div>
     </div></div>
@@ -987,7 +996,7 @@
           <label>分类方式</label><select id="tg-kind" style="border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink);outline:none"><option value="class">班级</option><option value="all">全部学生</option></select>
           <label style="margin-left:6px">选择班级</label><select id="tg-class" style="border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink);outline:none"></select>
           <label style="margin-left:6px">选择学生</label><input id="tg-stu" placeholder="输入账号筛选" style="border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink);outline:none;width:130px">
-          <button class="go" onclick="tAdminNav('class')">班级管理</button>
+          <button class="copy-ok" style="padding:7px 16px;font-size:13px" onclick="tAdminNav('class')">班级管理</button>
           
         </div>
         <div style="overflow-x:auto;border-radius:10px;background:#fff">
@@ -1047,8 +1056,52 @@
       <div id="day-list"></div>
       <div class="imp-actions"><button class="go" onclick="$('day-modal').classList.remove('open')">关闭</button></div>
     </div></div>
-    <!-- 学习详情 -->
-    <!-- 学习详情 -->
+  <!-- 试卷录入全屏页 -->
+  <div id="exam-page" style="display:none;position:fixed;inset:0;background:#eef1f6;z-index:9999;overflow:auto">
+    <div style="background:#fff;height:44px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #e5e8ef;font-size:14px;color:#666">
+      <span>试卷管理</span><span style="margin:0 8px;color:#bbb">›</span><b style="color:var(--ink)">新增试卷</b>
+      <span style="margin-left:auto;cursor:pointer;color:#666" onclick="closeExamPage()">返回</span>
+    </div>
+    <div style="display:flex;gap:14px;padding:16px;align-items:flex-start">
+      <div style="flex:1;background:#fff;border-radius:10px;padding:16px;min-height:520px">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:13px;color:#556;margin-bottom:10px">
+          <span id="ep-meta">小学 — 三年级 单元测试</span>
+          <span style="margin-left:auto;color:var(--primary);cursor:pointer" onclick="openMetaEdit()">修改指标</span>
+        </div>
+        <div style="font-size:13px;color:#666;margin-bottom:14px">大题数量：<b id="ep-bign">1</b>　　小题数量：<b id="ep-smalln">1</b></div>
+        <div id="ep-qs"></div>
+        <div style="text-align:right;margin-top:14px">
+          <button class="copy-ok" style="background:var(--primary);color:#fff;padding:8px 18px" onclick="addExamQ()">＋ 添加大题</button>
+        </div>
+      </div>
+      <div style="width:260px;background:#fff;border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:14px;color:var(--ink)">题量：<b id="ep-count">0</b></span>
+          <button class="copy-ok" style="background:var(--primary);color:#fff;padding:6px 14px;font-size:13px" onclick="saveFromExamPage()">生成</button>
+        </div>
+        <div style="border-top:1px dashed var(--line)"></div>
+      </div>
+    </div>
+  </div>
+  <!-- 删除试卷密码验证 -->
+  <div class="modal" id="del-pwd-modal"><div class="modal-box" style="max-width:380px">
+    <div class="modal-title" style="font-size:16px">删除验证</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin:10px 0">删除试卷需输入管理密码：</div>
+    <input id="del-pwd-input" type="password" placeholder="管理密码" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;outline:none;margin-bottom:14px">
+    <div class="imp-actions">
+      <button class="copy-ok sec" onclick="$('del-pwd-modal').classList.remove('open')">取消</button>
+      <button class="copy-ok" onclick="confirmDelExam()">确认删除</button>
+    </div>
+  </div></div>
+  <!-- 复制任务给他人：学生勾选 -->
+    <div class="modal" id="copy-modal"><div class="modal-box" style="max-width:420px">
+      <div class="modal-title">复制任务给学生</div>
+      <div id="copy-stu-list" style="max-height:320px;overflow-y:auto;text-align:left;margin-bottom:16px"></div>
+      <div class="imp-actions">
+        <button class="go" onclick="$('copy-modal').classList.remove('open')">取消</button>
+        <button class="go" style="background:var(--primary)" onclick="confirmCopyTask()">复制</button>
+      </div>
+    </div></div>
     <div id="t-detail" style="display:none">
       <div class="unit-bar" style="margin-bottom:10px">
         <label>学生</label>
@@ -1104,42 +1157,36 @@
     <!-- 试卷录入 -->
     <div id="t-exam" style="display:none">
       <div style="display:flex;gap:14px;align-items:stretch;height:calc(100vh - 130px);min-height:420px">
-        <div style="width:252px;background:#fff;border-radius:10px;padding:14px;flex:0 0 auto;display:flex;flex-direction:column;overflow:auto">
-          <div class="ex-basic" style="background:#f5f7fb;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">
-            <b style="font-size:13px">录入基本信息</b>
-            <div style="font-size:12px;color:#666;margin:8px 0 4px">学段</div>
-            <div id="ex-stage2" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-              <label><input type="radio" name="exstage2" value="小学" checked> 小学</label>
-              <label><input type="radio" name="exstage2" value="初中"> 初中</label>
-              <label><input type="radio" name="exstage2" value="高中"> 高中</label>
-            </div>
-            <div style="font-size:12px;color:#666;margin-bottom:4px">试卷类型</div>
-            <div id="ex-type2" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-              <label><input type="radio" name="extype2" value="单元测试" checked> 单元测试</label>
-              <label><input type="radio" name="extype2" value="月考"> 月考</label>
-              <label><input type="radio" name="extype2" value="期中"> 期中</label>
-              <label><input type="radio" name="extype2" value="期末"> 期末</label>
-              <label><input type="radio" name="extype2" value="模拟"> 模拟</label>
-            </div>
-            <div style="font-size:12px;color:#666;margin-bottom:4px">教材版本</div>
-            <select id="ex-ver2" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink);outline:none;margin-bottom:8px"></select>
-            <div style="font-size:12px;color:#666;margin-bottom:4px">年级</div>
-            <select id="ex-grade2" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink);outline:none;margin-bottom:8px"></select>
-            <div style="font-size:12px;color:#666;margin-bottom:4px">单元</div>
-            <select id="ex-unit2" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:13px;background:#fff;color:var(--ink);outline:none;margin-bottom:10px"></select>
-            <button class="go" style="background:var(--primary);color:#fff;width:100%;margin-bottom:6px" onclick="openExamEdit()">开始录入</button>
-            <button class="go" style="width:100%" onclick="openScanModal()">上传扫描识别</button>
+        <!-- 左：筛选区 -->
+        <div style="width:260px;background:#fff;border-radius:10px;padding:16px;flex:0 0 auto;display:flex;flex-direction:column;overflow:auto">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <b style="font-size:16px;color:var(--ink)">标准试卷</b>
+            <button class="copy-ok" style="padding:7px 14px;font-size:13px" onclick="createExam()">创建试卷</button>
           </div>
+          <div style="font-size:12px;color:#666;margin-bottom:4px">检索词</div>
+          <input id="ex-q" placeholder="试卷名称关键词" style="box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;outline:none;margin-bottom:12px">
+          <div style="font-size:12px;color:#666;margin-bottom:4px">学段</div>
+          <select id="ex-filter-stage" style="box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;background:#fff;outline:none;margin-bottom:12px">
+            <option value="">全部</option><option>小学</option><option>初中</option><option>高中</option>
+          </select>
+          <div style="font-size:12px;color:#666;margin-bottom:4px">试卷类型</div>
+          <select id="ex-filter-type" style="box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;background:#fff;outline:none;margin-bottom:12px">
+            <option value="">全部</option><option>单元</option><option>月考1</option><option>期中</option><option>月考2</option><option>期末</option><option>专项练</option>
+          </select>
+          <div style="font-size:12px;color:#666;margin-bottom:4px">状态</div>
+          <select id="ex-filter-status" style="box-sizing:border-box;border:1.5px solid var(--line);border-radius:8px;padding:7px 9px;font-family:inherit;font-size:13px;background:#fff;outline:none;margin-bottom:14px">
+            <option value="">全部</option><option>启用</option><option>未启用</option>
+          </select>
+          <button class="copy-ok" style="width:100%;padding:9px" onclick="renderExam()">查询</button>
+          <div style="flex:1"></div>
+          <button class="go" style="margin-top:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px;font-family:inherit;font-size:13px;cursor:pointer" onclick="openScanModal()">上传扫描识别</button>
         </div>
-        <div style="flex:1;background:#fff;border-radius:10px;padding:14px;min-width:0;display:flex;flex-direction:column;min-height:0">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--ink)"><input type="checkbox" id="ex-all" onchange="exToggleAll()"> 全选</label>
-            <span style="font-size:13px;color:var(--ink)">已选：<b id="ex-sel">0</b></span>
-            <button class="go" onclick="examOp(this)">删除</button>
-            <button class="go" onclick="examOp(this)">更换文件夹</button>
-            <button class="go" onclick="examOp(this)">文件夹管理</button>
+        <!-- 右：已录试卷区 -->
+        <div style="flex:1;background:#fff;border-radius:10px;padding:16px;min-width:0;display:flex;flex-direction:column;min-height:0">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+            <b style="font-size:15px;color:var(--ink)">已录试卷区</b>
             <span style="flex:1"></span>
-            <span style="font-size:12px;color:var(--ink)" id="ex-count">共 0 条</span>
+            <span style="font-size:12px;color:var(--ink-soft)" id="ex-count">共 0 条</span>
           </div>
           <div id="ex-list" style="display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow:auto"></div>
         </div>
@@ -1159,6 +1206,69 @@
         </div>
       </div>
     </div>
+    <!-- 创建试卷：基本信息 -->
+    <div class="modal" id="ce-modal"><div class="modal-box" style="max-width:480px">
+      <div class="modal-title" style="font-size:16px">创建试卷</div>
+      <div style="margin:12px 0">
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">试卷名</div>
+        <input id="ce-name" placeholder="如：人教九上10月考闯关" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;outline:none">
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">阶段</div>
+        <label style="font-size:13px;margin-right:14px"><input type="radio" name="ce-stage" value="小学" checked> 小学</label>
+        <label style="font-size:13px;margin-right:14px"><input type="radio" name="ce-stage" value="初中"> 初中</label>
+        <label style="font-size:13px"><input type="radio" name="ce-stage" value="高中"> 高中</label>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">年级</div>
+          <select id="ce-grade" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>一年级</option><option>二年级</option><option>三年级</option><option>四年级</option><option>五年级</option><option>六年级</option>
+            <option>七年级</option><option>八年级</option><option>九年级</option>
+            <option>高一</option><option>高二</option><option>高三</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">类型</div>
+          <select id="ce-type" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>单元</option><option>月考1</option><option>期中</option><option>月考2</option><option>期末</option><option>专项练习</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">版本（教材）</div>
+        <select id="ce-ver" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+          <option>人教PEP</option><option>牛津译林</option><option>外研社</option><option>人教版</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">册别</div>
+          <select id="ce-book" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>上册</option><option>下册</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">单元</div>
+          <select id="ce-unit" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>Unit 1</option><option>Unit 2</option><option>Unit 3</option><option>Unit 4</option><option>Unit 5</option>
+            <option>Unit 6</option><option>Unit 7</option><option>Unit 8</option><option>Unit 9</option><option>Unit 10</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">大题数</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="copy-ok sec" style="padding:6px 12px" onclick="ceStep(-1,'big')">－</button>
+            <input id="ce-big" value="1" readonly style="width:50px;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:7px;font-family:inherit;font-size:14px">
+            <button class="copy-ok" style="padding:6px 12px" onclick="ceStep(1,'big')">＋</button>
+          </div>
+        </div>
+      <div class="imp-actions">
+        <button class="copy-ok sec" style="background:#fff;color:var(--ink);border:1.5px solid var(--line)" onclick="closeCreateExam()">取消</button>
+        <button class="copy-ok" onclick="submitCreateExam()">开始录入题目</button>
+      </div>
+    </div></div>
     <div class="modal" id="exedit-modal">
       <div class="modal-mask" onclick="closeExamEdit()"></div>
       <div class="modal-box" style="width:96%;max-width:1200px;max-height:94vh;overflow:hidden;display:flex;flex-direction:column">
@@ -1307,7 +1417,10 @@
   <div class="modal-mask" onclick="closeTaskModal()"></div>
   <div class="modal-box content-box">
     <button class="close" onclick="closeTaskModal()" aria-label="关闭">&times;</button>
-    <div class="modal-title">今日任务</div>
+    <div class="modal-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>今日任务</span>
+      <button onclick="logout()" style="border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:10px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:inherit">退出登录</button>
+    </div>
     <div id="task-list"></div>
   </div>
 </div>
@@ -1325,6 +1438,8 @@
       <select id="study-ver-sel"></select>
       <label>年级</label>
       <select id="study-grade-sel"></select>
+      <label>册别</label>
+      <select id="study-book-sel"><option>上册</option><option>下册</option></select>
       <label>单元</label>
       <select id="study-unit-sel"></select>
     </div>
@@ -1634,11 +1749,7 @@
   /* 学习内容选择弹窗 */
   var VERSIONS = ['人教版(PEP)', '外研版', '译林版', '北师大版'];
   var GRADE_STAGES = ['小学三年级', '小学四年级', '小学五年级', '小学六年级', '初中七年级', '初中八年级', '初中九年级'];
-  var GRADES = [];
-  GRADE_STAGES.forEach(function(st){
-    GRADES.push(st + '上册');
-    GRADES.push(st + '下册');
-  });
+  var GRADES = ['一年级','二年级','三年级','四年级','五年级','六年级','七年级','八年级','九年级','高一','高二','高三'];
   function customVars(key){ try{ return JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ return []; } }
   function getVersions(){ return VERSIONS.concat(customVars('english_custom_versions')); }
   function getGrades(){ return GRADES.concat(customVars('english_custom_grades')); }
@@ -1697,11 +1808,17 @@
   function rebuildUnits(){
     var n = unitCount($('study-unit-sel').dataset.grade || '小学三年级');
     var arr = [];
-    for(var i = 1; i <= n; i++){ arr.push('第' + i + '单元'); }
+    for(var i = 1; i <= n; i++){ arr.push('Unit ' + i); }
     fillOptions($('study-unit-sel'), arr);
   }
   function saveSelection(){
-    try{ localStorage.setItem(SAVE_KEY, JSON.stringify({ver: CUR_VER, grade: CUR_GRADE})); }catch(e){}
+    try{
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        ver: CUR_VER, grade: CUR_GRADE,
+        book: $('study-book-sel') ? $('study-book-sel').value : '',
+        unit: $('study-unit-sel') ? $('study-unit-sel').value : ''
+      }));
+    }catch(e){}
   }
   function loadSelection(){
     try{
@@ -1724,12 +1841,22 @@
     fillOptions($('study-grade-sel'), getGrades());
     $('study-ver-sel').value = CUR_VER;
     $('study-grade-sel').value = CUR_GRADE;
+    var saved = loadSelection();
+    if($('study-book-sel')){
+      if(saved && saved.book) $('study-book-sel').value = saved.book;
+    }
     $('study-unit-sel').dataset.grade = CUR_GRADE;
     rebuildUnits();
+    if(saved && saved.unit){ $('study-unit-sel').value = saved.unit; }
     updateSummary();
     $('hdr-import').style.display = ROLE === '校长' ? 'inline-flex' : 'none';   // 内容管理仅校长可见
     $('card').classList.add('hidden');
     $('study-page').classList.add('active');
+    // 学生端：今日有未完成的强制任务则优先弹出，完成前不可自由学习
+    if(ROLE === '学生' && forcePendingTask(ROLE_ACCOUNT)){
+      TASK_START = Date.now();
+      setTimeout(function(){ openTaskModal(true); }, 400);
+    }
   }
   function confirmStart(){
     CUR_VER = $('sel-ver').value;
@@ -1743,6 +1870,10 @@
     $('study-page').classList.remove('active');
     $('card').classList.remove('hidden');
   }
+  function logout(){
+    try{ localStorage.removeItem('auto_login'); }catch(e){}
+    location.reload();
+  }
   // 顶部教材/年级/单元选择：学生可随时更改并保存
   $('study-ver-sel').addEventListener('change', function(){
     CUR_VER = this.value; saveSelection(); updateSummary();
@@ -1755,7 +1886,8 @@
     saveSelection(); updateSummary();
     toast('年级已切换为「' + CUR_GRADE + '」，单元已更新', 'ok');
   });
-  $('study-unit-sel').addEventListener('change', updateSummary);
+  $('study-unit-sel').addEventListener('change', function(){ saveSelection(); updateSummary(); });
+  if($('study-book-sel')) $('study-book-sel').addEventListener('change', function(){ saveSelection(); updateSummary(); });
 
   /* 四大学习区（字母音标 / 词汇 / 句子 / 同步拓展） */
   var ZONES = [
@@ -2028,6 +2160,12 @@
   }
   function enterModule(fn, name){
     if(fn === 'alpha'){ openAlphaMenu(); return; }
+    // 强制任务拦截：有待完成的今日强制任务时，非任务学习入口一律先回到任务
+    if(ROLE === '学生' && !TASK_LIMIT && forcePendingTask(ROLE_ACCOUNT)){
+      openTaskModal(true);
+      toast('请先完成今日布置的学习任务，完成后才能自由学习', 'err');
+      return;
+    }
     if(fn === 'recog'){ startWordLearning('recog'); }
     else if(fn === 'listen'){ startWordLearning('listen'); }
     else if(fn === 'copy'){ startWordCopy(); }
@@ -2038,7 +2176,34 @@
     else if(fn === 'sread'){ startSReadLearning(); }
     else if(fn === 'grammar'){ openContent('grammar'); }
     else if(fn === 'text'){ openTextPage(); }
+    else if(fn === 'exam'){ openStudentExam(); }
     else { toast('「' + name + '」板块建设中，敬请期待', 'err'); }
+  }
+  function openStudentExam(){
+    if($('exam-page')) $('exam-page').style.display = 'none';
+    document.body.appendChild($('exprev-modal'));
+    var all = readExams();
+    var list = all.filter(function(x){
+      if(x.status !== '启用' && x.status !== '已上架') return false;
+      var g = (x.grade||''), c = (CUR_GRADE||'');
+      if(g && c && g !== c && c.indexOf(g) < 0 && g.indexOf(c) < 0) return false;
+      var book = $('study-book-sel') ? $('study-book-sel').value : '';
+      if(x.unit && book && (x.unit.indexOf('上册') >= 0 || x.unit.indexOf('下册') >= 0) && x.unit.indexOf(book) < 0) return false;
+      var curUnit = $('study-unit-sel') ? $('study-unit-sel').value : '';
+      if(x.unit && curUnit && x.unit.indexOf(curUnit) < 0) return false;
+      return true;
+    });
+    var h = '<div style="margin-bottom:12px"><b style="font-size:16px;color:var(--ink)">同步试卷</b><span style="font-size:12px;color:var(--ink-soft);margin-left:8px">共 ' + list.length + ' 份</span></div>';
+    if(!list.length){ h += '<p class="t-empty">当前年级暂无已启用的试卷</p>'; }
+    list.forEach(function(x){
+      h += '<div style="border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+        '<div style="flex:1;min-width:0"><div style="font-weight:600;color:var(--ink);font-size:14px">' + escHtml(x.name) + '</div>' +
+        '<div style="font-size:12px;color:#666;margin-top:3px">' + escHtml(x.type||'') + ' · ' + escHtml(x.grade||'') + (x.unit ? ' · ' + escHtml(x.unit) : '') + ' · ' + (x.questions ? x.questions.length : x.big) + ' 题</div></div>' +
+        '<button class="copy-ok" style="font-size:12px;padding:6px 14px" onclick="startStudentExam(\'' + String(x.id) + '\')">开始测试</button>' +
+        '</div>';
+    });
+    $('exprev-body').innerHTML = h;
+    $('exprev-modal').classList.add('open');
   }
   function renderZones(){
     var grid = $('zone-grid');
@@ -2088,6 +2253,22 @@
   function taskKey(acc){ return 'english_tasks_' + acc; }
   function readTasks(acc){ try{ var x = JSON.parse(localStorage.getItem(taskKey(acc)) || 'null'); return (x && x.length) ? x : []; }catch(e){ return []; } }
   function writeTasks(acc, arr){ try{ localStorage.setItem(taskKey(acc), JSON.stringify(arr)); }catch(e){} }
+  function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  // 今日是否有未完成的强制任务：有则返回该任务，否则 null
+  function forcePendingTask(acc){
+    var today = todayStr();
+    var tasks = readTasks(acc);
+    for(var i=0;i<tasks.length;i++){
+      var t = normTask(tasks[i]);
+      if(!t.force) continue;
+      if(!t.date || t.date !== today) continue;
+      var done = readDone(acc)[t.id] || {};
+      var total = 0, doneN = 0;
+      TASK_ORDER.forEach(function(k){ (t.sections[k]||[]).forEach(function(it, idx){ total++; if(done['i'+idx]) doneN++; }); });
+      if(total > 0 && doneN < total) return t;
+    }
+    return null;
+  }
   function studentsList(){
     var list = ['student1'];
     try{ var us = JSON.parse(localStorage.getItem('english_users') || '[]'); us.forEach(function(u){ if(u.role === '学生' && list.indexOf(u.account) < 0) list.push(u.account); }); }catch(e){}
@@ -2232,17 +2413,19 @@
     toast('已导出 ' + list.length + ' 条会员数据', 'ok');
   }
   var MM_EDIT = null;
-  function openMemberModal(){ MM_EDIT = null; $('mm-title').textContent = '新增会员'; ['mm-account','mm-name','mm-nick','mm-phone','mm-school','mm-grade','mm-expire','mm-coins'].forEach(function(id){ $(id).value = ''; }); $('member-modal').classList.add('open'); }
-  function editMember(acc){ var m = readMembers().filter(function(x){ return x.account === acc; })[0]; if(!m){ toast('未找到该会员','err'); return; } MM_EDIT = acc; $('mm-title').textContent = '修改会员'; $('mm-account').value = m.account; $('mm-name').value = m.name||''; $('mm-nick').value = m.nickname||''; $('mm-phone').value = m.phone||''; $('mm-school').value = m.school||''; $('mm-grade').value = m.grade||''; $('mm-expire').value = m.expire||''; $('mm-coins').value = m.coins||''; $('member-modal').classList.add('open'); }
+  function openMemberModal(){ MM_EDIT = null; $('mm-title').textContent = '新增会员'; ['mm-account','mm-name','mm-nick','mm-phone','mm-school','mm-grade','mm-expire','mm-pwd'].forEach(function(id){ $(id).value = ''; }); $('member-modal').classList.add('open'); }
+  function editMember(acc){ var m = readMembers().filter(function(x){ return x.account === acc; })[0]; if(!m){ toast('未找到该会员','err'); return; } MM_EDIT = acc; $('mm-title').textContent = '修改会员'; $('mm-account').value = m.account; $('mm-name').value = m.name||''; $('mm-nick').value = m.nickname||''; $('mm-phone').value = m.phone||''; $('mm-school').value = m.school||''; $('mm-grade').value = m.grade||''; $('mm-expire').value = m.expire||''; $('mm-pwd').value = ''; $('member-modal').classList.add('open'); }
   function closeMemberModal(){ $('member-modal').classList.remove('open'); }
   function saveMemberModal(){
     var acc = ($('mm-account').value || '').trim();
     if(!acc){ toast('账号必填','err'); return; }
-    var nm = { account:acc, name:($('mm-name').value||'').trim(), nickname:($('mm-nick').value||'').trim(), phone:($('mm-phone').value||'').trim(), school:($('mm-school').value||'').trim(), grade:($('mm-grade').value||'').trim(), expire:$('mm-expire').value||'', coins:parseInt($('mm-coins').value,10)||0, stageName:'小学', stage:($('mm-expire').value ? '小学：' + $('mm-expire').value : '') };
+    var nm = { account:acc, name:($('mm-name').value||'').trim(), nickname:($('mm-nick').value||'').trim(), phone:($('mm-phone').value||'').trim(), school:($('mm-school').value||'').trim(), grade:($('mm-grade').value||'').trim(), expire:$('mm-expire').value||'', stageName:'小学', stage:($('mm-expire').value ? '小学：' + $('mm-expire').value : '') };
+    var newPwd = ($('mm-pwd').value || '').trim();
     var list = readMembers();
     if(MM_EDIT){
       var i = -1; list.forEach(function(x,j){ if(x.account === acc) i = j; });
       if(i >= 0) list[i] = Object.assign(list[i], nm);
+      if(newPwd){ var us = readUsers(); us.forEach(function(u){ if(u.account === acc) u.password = newPwd; }); writeUsers(us); }
     } else {
       if(list.some(function(x){ return x.account === acc; })){ toast('该账号已存在','err'); return; }
       var us = readUsers(); us.push({ account:acc, password:'123456', role:'学生' }); writeUsers(us);
@@ -2420,6 +2603,7 @@
   function readExams(){
     var arr = null; try{ arr = JSON.parse(localStorage.getItem('english_exam') || 'null'); }catch(e){}
     if(!arr || !arr.length){ arr = EXAM_DATA; try{ localStorage.setItem('english_exam', JSON.stringify(arr)); }catch(e){} }
+    arr.forEach(function(x, i){ if(!x.id) x.id = 'legacy_' + i + '_' + (x.name || ''); });
     return arr;
   }
   function writeExams(arr){ try{ localStorage.setItem('english_exam', JSON.stringify(arr)); }catch(e){} }
@@ -2447,15 +2631,22 @@
     renderExam();
     toast('已识别并生成试卷：「' + pp.name + '」，共 ' + (pp.questions ? pp.questions.length : (pp.small || 0)) + ' 题', 'ok');
   }
-  function openExamEdit(){
-    if(!$('ex-ver2').options.length){ fillOptions($('ex-ver2'), getVersions()); fillOptions($('ex-grade2'), getGrades()); }
-    if(!$('ex-unit2').options.length){ var n = unitCount($('ex-grade2').value); var arr = []; for(var i = 1; i <= n; i++){ arr.push('第' + i + '单元'); } fillOptions($('ex-unit2'), arr); }
+  var EDIT_EXAM_ID = null;
+  function openExamEdit(id){
+    EDIT_EXAM_ID = id || null;
     $('ex-name').value = '';
     $('exedit-qs').innerHTML = '';
-    addExamQ();
-    var st = (document.querySelector('input[name="exstage2"]:checked') || {}).value || '小学';
-    var ty = (document.querySelector('input[name="extype2"]:checked') || {}).value || '单元测试';
-    $('ex-meta').textContent = st + ' · ' + $('ex-ver2').value + ' · ' + $('ex-grade2').value + ' · ' + ty + ' · ' + $('ex-unit2').value;
+    if(id){
+      var x = readExams().filter(function(e){ return String(e.id) === String(id); })[0];
+      if(x){
+        $('ex-name').value = x.name || '';
+        (x.questions || []).forEach(function(q){ addExamQ(q); });
+        $('ex-meta').textContent = (x.stage||'') + ' · ' + (x.grade||'') + (x.unit||'') + ' · ' + (x.type||'');
+      }
+    } else {
+      addExamQ();
+      $('ex-meta').textContent = '新建试卷';
+    }
     $('exedit-modal').classList.add('open');
   }
   function closeExamEdit(){ $('exedit-modal').classList.remove('open'); }
@@ -2475,8 +2666,8 @@
     r.readAsDataURL(f);
     toast('已粘贴题干截图', 'ok');
   }
-  function addExamQ(){
-    var box = $('exedit-qs');
+  function addExamQ(data){
+    var box = $('ep-qs');
     var d = document.createElement('div');
     d.className = 'ex-q';
     d.style.cssText = 'border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;background:#fafbfe;display:flex;gap:12px;align-items:flex-start';
@@ -2505,6 +2696,23 @@
       '</div>';
     box.appendChild(d);
     addBlank(d.querySelector('.q-blanks'));
+    updateEpCount();
+    if(data){
+      d.querySelector('.qt-stem').value = data.stem || '';
+      if(data.type) d.querySelector('.qt-type').value = data.type;
+      if(data.img){ var im = d.querySelector('.q-img'); im.src = data.img; im.style.display = 'block'; }
+      var blanks = data.blanks || [];
+      if(blanks.length){
+        var bc = d.querySelector('.q-blanks');
+        bc.innerHTML = '';
+        blanks.forEach(function(b){
+          addBlankRow(bc);
+          var row = bc.lastChild;
+          row.querySelector('.b-ans').value = b.ans || '';
+          row.querySelector('.b-tip').value = b.tip || '';
+        });
+      }
+    }
   }
   function toggleAudio(sel){
     var q = sel.closest('.ex-q');
@@ -2560,15 +2768,16 @@
   function delExamQ(btn){
     var row = btn.closest('.ex-q');
     row.parentNode.removeChild(row);
-    Array.prototype.forEach.call($('exedit-qs').querySelectorAll('.ex-q'), function(el, i){
+    Array.prototype.forEach.call($('ep-qs').querySelectorAll('.ex-q'), function(el, i){
       el.querySelector('b').textContent = '第' + (i + 1) + '题';
     });
+    updateEpCount();
   }
   function saveExamEdit(){
-    var ver = $('ex-ver2').value, grade = $('ex-grade2').value;
-    var stage = (document.querySelector('input[name="exstage2"]:checked') || {}).value || '小学';
-    var type = (document.querySelector('input[name="extype2"]:checked') || {}).value || '单元测试';
-    var unit = ($('ex-unit2') && $('ex-unit2').value) || '';
+    var ver = '人教PEP', grade = '三年级';
+    var stage = ($('ex-filter-stage') && $('ex-filter-stage').value) || '小学';
+    var type = ($('ex-filter-type') && $('ex-filter-type').value) || '单元';
+    var unit = '';
     var rows = $('exedit-qs').querySelectorAll('.ex-q');
     var qs = [];
     for(var i = 0; i < rows.length; i++){
@@ -2589,23 +2798,110 @@
     if(!qs.length){ toast('请至少录入一道题', 'err'); return; }
     var name = $('ex-name').value.replace(/^\s+|\s+$/g, '') || (grade + unit + '《' + type + '》试卷');
     var list = readExams();
-    list.unshift({ id: 'manual_' + Date.now(), name: name, stage: stage, grade: grade, unit: unit, type: type, year: String(new Date().getFullYear()), status: '未上架', big: qs.length, small: qs.length, questions: qs });
+    if(EDIT_EXAM_ID){
+      list.forEach(function(x){
+        if(String(x.id) === String(EDIT_EXAM_ID)){
+          x.name = name; x.stage = stage; x.grade = grade; x.unit = unit; x.type = type;
+          x.big = qs.length; x.small = qs.length; x.questions = qs;
+        }
+      });
+    } else {
+      list.unshift({ id: 'manual_' + Date.now(), name: name, stage: stage, grade: grade, unit: unit, type: type, year: String(new Date().getFullYear()), status: '未启用', big: qs.length, small: qs.length, questions: qs });
+    }
     if(JSON.stringify(list).length > 4.5 * 1024 * 1024){ toast('试卷过大（含听力音频），请压缩音频或减少题目', 'err'); return; }
     writeExams(list);
     closeExamEdit();
     renderExam();
-    toast('已录入试卷「' + name + '」，共 ' + qs.length + ' 题', 'ok');
+    toast(EDIT_EXAM_ID ? '已更新试卷「' + name + '」' : '已录入试卷「' + name + '」，共 ' + qs.length + ' 题', 'ok');
+    EDIT_EXAM_ID = null;
   }
   var EXAM_DATA = [
-    {name:'人教九上10月考闯关(26新上分)', stage:'初中', grade:'九年级', type:'月考', year:'2026', status:'未上架', big:8, small:8},
-    {name:'人教八上10月考闯关(26新上分)', stage:'初中', grade:'八年级', type:'月考', year:'2026', status:'未上架', big:8, small:8},
-    {name:'人教七上10月考闯关(26新上分)', stage:'初中', grade:'七年级', type:'月考', year:'2026', status:'未上架', big:8, small:8},
-    {name:'译林六上第三单元阶段闯关(26新全程)', stage:'小学', grade:'六年级', type:'单元测试', year:'2026', status:'未上架', big:11, small:11},
-    {name:'译林五上第三单元阶段闯关(26新全程)', stage:'小学', grade:'五年级', type:'单元测试', year:'2026', status:'未上架', big:12, small:12},
-    {name:'人教版三上Unit1单元测试', stage:'小学', grade:'三年级', type:'单元测试', year:'2025', status:'已上架', big:10, small:10}
+    {id:'demo_1', name:'人教九上10月考闯关(26新上分)', stage:'初中', grade:'九年级', type:'月考', year:'2026', status:'未启用', big:8, small:8},
+    {id:'demo_2', name:'人教八上10月考闯关(26新上分)', stage:'初中', grade:'八年级', type:'月考', year:'2026', status:'未启用', big:8, small:8},
+    {id:'demo_3', name:'人教七上10月考闯关(26新上分)', stage:'初中', grade:'七年级', type:'月考', year:'2026', status:'未启用', big:8, small:8},
+    {id:'demo_4', name:'译林六上第三单元阶段闯关(26新全程)', stage:'小学', grade:'六年级', type:'单元', year:'2026', status:'未启用', big:11, small:11},
+    {id:'demo_5', name:'译林五上第三单元阶段闯关(26新全程)', stage:'小学', grade:'五年级', type:'单元', year:'2026', status:'未启用', big:12, small:12},
+    {id:'demo_6', name:'人教版三上Unit1单元测试', stage:'小学', grade:'三年级', type:'单元', year:'2025', status:'启用', big:10, small:10}
   ];
   function exRadioVal(name){ var r = document.querySelector('input[name=' + name + ']:checked'); return r ? r.value : ''; }
-  function createExam(){ toast('创建标准试卷功能建设中，敬请期待', ''); }
+  function createExam(){
+    $('ce-name').value = '';
+    $('ce-big').value = 1;
+    $('ce-modal').classList.add('open');
+  }
+  function closeCreateExam(){ $('ce-modal').classList.remove('open'); }
+  function ceStep(d, which){
+    var el = $(which === 'big' ? 'ce-big' : 'ce-small');
+    el.value = Math.max(1, parseInt(el.value||1) + d);
+  }
+  var EP_INFO = null;
+  function openMetaEdit(){
+    $('exam-page').style.display = 'none';
+    $('ce-name').value = EP_INFO.name || '';
+    $('ce-big').value = EP_INFO.big || 1;
+    var r = document.querySelector('input[name="ce-stage"][value="' + (EP_INFO.stage||'小学') + '"]'); if(r) r.checked = true;
+    $('ce-grade').value = EP_INFO.grade || '一年级';
+    $('ce-type').value = EP_INFO.type || '单元';
+    $('ce-ver').value = EP_INFO.ver || '人教PEP';
+    $('ce-book').value = EP_INFO.book || '上册';
+    $('ce-unit').value = EP_INFO.unit || 'Unit 1';
+    $('ce-modal').classList.add('open');
+  }
+  function submitCreateExam(){
+    var name = $('ce-name').value.replace(/^\s+|\s+$/g,'');
+    if(!name){ toast('请输入试卷名', 'err'); return; }
+    var stage = (document.querySelector('input[name="ce-stage"]:checked')||{}).value || '小学';
+    EP_INFO = { name:name, stage:stage, grade:$('ce-grade').value, type:$('ce-type').value, ver:$('ce-ver').value, book:$('ce-book').value, unit:$('ce-unit').value, big:$('ce-big').value };
+    closeCreateExam();
+    $('exam-page').style.display = 'block';
+    $('ep-meta').textContent = EP_INFO.stage + ' — ' + EP_INFO.grade + '  ' + EP_INFO.type + '  ' + EP_INFO.ver + '  ' + EP_INFO.book + '  ' + EP_INFO.unit;
+    $('ep-bign').innerText = EP_INFO.big;
+    if(!$('ep-qs').children.length){ addExamQ(); }
+    updateEpCount();
+  }
+  function openExamPage(){
+    $('ep-meta').textContent = EP_INFO.stage + ' — ' + EP_INFO.grade + '  ' + EP_INFO.type + '  ' + EP_INFO.ver + '  ' + EP_INFO.book + '  ' + EP_INFO.unit;
+    $('ep-bign').innerText = EP_INFO.big;
+    $('ep-smalln').innerText = EP_INFO.small;
+    $('ep-qs').innerHTML = '';
+    addExamQ();
+    $('exam-page').style.display = 'block';
+    updateEpCount();
+  }
+  function closeExamPage(){ $('exam-page').style.display = 'none'; }
+  function saveFromExamPage(){
+    var qs = [];
+    document.querySelectorAll('#ep-qs .ex-q').forEach(function(r){
+      var stem = r.querySelector('.qt-stem').value;
+      var qimg = r.querySelector('.q-img');
+      var qaudio = r.querySelector('.qt-audio');
+      var blanks = [];
+      r.querySelectorAll('.q-blank').forEach(function(b){
+        blanks.push({ ans: b.querySelector('.b-ans').value, tip: b.querySelector('.b-tip').value });
+      });
+      qs.push({ no: qs.length + 1, type: r.querySelector('.qt-type').value, stem: stem, blanks: blanks, img: (qimg && qimg.src && qimg.style.display !== 'none') ? qimg.src : '', audio: (qaudio && qaudio.dataset.audio) ? qaudio.dataset.audio : '' });
+    });
+    if(!qs.length){ toast('请至少录入一道题', 'err'); return; }
+    var list = readExams();
+    if(EDIT_EXAM_ID){
+      list.forEach(function(x){
+        if(String(x.id) === String(EDIT_EXAM_ID)){
+          x.name = EP_INFO.name; x.stage = EP_INFO.stage; x.grade = EP_INFO.grade; x.unit = EP_INFO.unit; x.type = EP_INFO.type;
+          x.big = qs.length; x.small = qs.length; x.questions = qs;
+        }
+      });
+    } else {
+      list.unshift({ id: 'manual_' + Date.now(), name: EP_INFO.name, stage: EP_INFO.stage, grade: EP_INFO.grade, unit: EP_INFO.book + ' ' + EP_INFO.unit, type: EP_INFO.type, year: String(new Date().getFullYear()), status: '未启用', big: qs.length, small: qs.length, questions: qs });
+    }
+    writeExams(list);
+    EDIT_EXAM_ID = null;
+    closeExamPage();
+    renderExam();
+    toast(EDIT_EXAM_ID ? '已更新试卷「' + EP_INFO.name + '」' : '已录入试卷「' + EP_INFO.name + '」，共 ' + qs.length + ' 题', 'ok');
+  }
+  function updateEpCount(){
+    $('ep-count').innerText = $('ep-qs').children.length;
+  }
   function exTab(t){ toast('已切换到「' + (t === 'std' ? '标准试卷' : '普通试卷') + '」视图（建设中）', ''); }
   function examOp(el){ toast('「' + el.innerText.trim() + '」功能建设中，敬请期待', ''); }
   function previewExam(id){
@@ -2643,10 +2939,112 @@
       h += '</div>';
       h += '</div>';
     });
+    h += '<div style="text-align:right;margin-top:14px;border-top:1px solid var(--line);padding-top:12px"><button class="copy-ok" style="padding:8px 20px" onclick="editFromPreview(\'' + String(x.id) + '\')">修改试卷</button></div>';
     $('exprev-body').innerHTML = h;
     $('exprev-modal').classList.add('open');
   }
+  function editFromPreview(id){
+    $('exprev-modal').classList.remove('open');
+    EDIT_EXAM_ID = id;
+    var x = readExams().filter(function(e){ return String(e.id) === String(id); })[0];
+    EP_INFO = { name: x.name, stage: x.stage, grade: x.grade, type: x.type, ver: '', book: '', unit: x.unit || '', big: x.big, small: x.small };
+    $('ep-meta').textContent = (x.stage||'') + ' — ' + (x.grade||'') + '  ' + (x.type||'') + '  ' + (x.unit||'');
+    $('ep-bign').innerText = x.big;
+    $('ep-smalln').innerText = x.small;
+    $('ep-qs').innerHTML = '';
+    (x.questions || []).forEach(function(q){ addExamQ(q); });
+    $('exam-page').style.display = 'block';
+    updateEpCount();
+  }
   function closePrevExam(){ $('exprev-modal').classList.remove('open'); }
+  var TAKE_EXAM = null;
+  function startStudentExam(id){
+    $('exprev-modal').classList.remove('open');
+    if($('exam-page')) $('exam-page').style.display = 'none';
+    var x = readExams().filter(function(e){ return String(e.id) === String(id); })[0];
+    if(!x){ toast('试卷不存在', 'err'); return; }
+    TAKE_EXAM = x;
+    var qs = x.questions || [];
+    var h = '<div style="position:fixed;inset:0;background:#f5f7fa;z-index:99999;display:flex;flex-direction:column">';
+    h += '<div style="background:#fff;padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #e5e7eb;flex:none">';
+    h += '<button onclick="closeTakeExam()" style="background:none;border:1px solid #ddd;border-radius:8px;padding:6px 14px;cursor:pointer">返回</button>';
+    h += '<b style="font-size:16px">' + escHtml(x.name) + '</b>';
+    h += '<span style="color:#888;font-size:13px;margin-left:auto">共 ' + qs.length + ' 大题</span>';
+    h += '<div class="take-score" style="display:none;color:#333;font-size:14px"></div>';
+    h += '<button onclick="submitTakeExam()" style="background:var(--primary);color:#fff;border:none;border-radius:10px;padding:8px 24px;font-size:15px;cursor:pointer">提交试卷</button>';
+    h += '</div>';
+    h += '<div style="flex:1;display:flex;overflow:hidden">';
+    h += '<div style="flex:1;overflow:auto;padding:20px">';
+    var bi = 0;
+    qs.forEach(function(q, qi){
+      h += '<div style="background:#fff;border-radius:12px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;overflow:hidden">';
+      h += '<div style="flex:1;padding:16px;border-right:1px solid #eee">';
+      h += '<div style="font-weight:600;color:#555;margin-bottom:8px">第' + (qi+1) + '题 · ' + escHtml(q.type||'') + '</div>';
+      if(q.img) h += '<img src="' + q.img + '" style="max-width:100%;max-height:300px;margin-bottom:10px;border-radius:8px">';
+      h += '<div style="white-space:pre-wrap;font-size:14px;line-height:1.8">' + escHtml(q.stem||'') + '</div>';
+      h += '</div>';
+      h += '<div style="flex:1;padding:16px;background:#fafbfd">';
+      h += '<div style="font-weight:600;color:#555;margin-bottom:8px;font-size:13px">答题区</div>';
+      (q.blanks||[]).forEach(function(b, bIdx){
+        h += '<div style="margin-bottom:10px">';
+        h += '<label style="font-size:13px;color:#666">空位' + (bi+1) + '</label>';
+        h += '<input type="text" class="take-blank" data-q="' + qi + '" data-b="' + bIdx + '" style="width:100%;margin-top:4px;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">';
+        h += '</div>';
+        bi++;
+      });
+      h += '</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+    h += '</div></div>';
+    var od = document.createElement('div');
+    od.id = 'take-exam-wrap';
+    od.innerHTML = h;
+    document.body.appendChild(od);
+  }
+  function closeTakeExam(){
+    var w = document.getElementById('take-exam-wrap');
+    if(w) w.remove();
+    TAKE_EXAM = null;
+  }
+  function submitTakeExam(){
+    if(!TAKE_EXAM){ return; }
+    var btn = document.querySelector('#take-exam-wrap button[onclick="submitTakeExam()"]');
+    if(btn){ btn.disabled = true; btn.textContent = '已提交'; btn.style.opacity = .6; }
+    var total = 0, right = 0;
+    var inputs = document.querySelectorAll('.take-blank');
+    inputs.forEach(function(el){
+      var qi = parseInt(el.dataset.q);
+      var bi = parseInt(el.dataset.b);
+      var q = TAKE_EXAM.questions[qi];
+      if(!q || !q.blanks || !q.blanks[bi]) return;
+      var b = q.blanks[bi];
+      total++;
+      var val = el.value.trim().toLowerCase();
+      var ans = (b.ans||'').trim().toLowerCase();
+      var ok = val && ans && (val === ans || val.indexOf(ans) >= 0 || ans.indexOf(val) >= 0);
+      if(!val) return;
+      if(ok) right++;
+      el.disabled = true;
+      var res = document.createElement('div');
+      if(ok){
+        el.style.borderColor = '#5FA961';
+        el.style.background = '#f0f9f0';
+        res.innerHTML = '<div style="color:#5FA961;font-size:13px;margin-top:4px;font-weight:600">答对了</div>';
+      } else {
+        el.style.borderColor = '#e74c3c';
+        el.style.background = '#fdf0ef';
+        var html = '<div style="color:#e74c3c;font-size:13px;margin-top:4px;font-weight:600">答错了</div>';
+        if(b.tip) html += '<div style="color:#888;font-size:12px;margin-top:4px;background:#fafbfd;padding:6px 8px;border-radius:6px">思路引导：' + escHtml(b.tip) + '</div>';
+        res.innerHTML = html;
+      }
+      el.parentNode.appendChild(res);
+    });
+    var score = total ? Math.round(right/total*100) : 0;
+    var bar = document.querySelector('#take-exam-wrap .take-score');
+    if(bar){ bar.innerHTML = '本次得分：<b style="font-size:20px;color:var(--primary)">' + score + '</b> 分（' + right + '/' + total + '）'; bar.style.display = 'block'; }
+    toast('批改完成，得分 ' + score + ' 分', 'ok');
+  }
   var SEND_CUR_ID = null;
   function sendExam(id){
     var list = readExams(); var x = null;
@@ -2734,31 +3132,66 @@
   }
   function toggleItem(el){ var c = el.querySelector('.ex-chk'); if(c){ c.checked = !c.checked; exCount(); } }
   function renderExam(){
-    var list = readExams();
-    var ops = ['查看知识点','预览','生成模版','删除','编辑','编辑记录','发送','撤销发送'];
+    var q = ($('ex-q') && $('ex-q').value || '').trim().toLowerCase();
+    var fStage = $('ex-filter-stage').value;
+    var fType = $('ex-filter-type').value;
+    var fStatus = $('ex-filter-status').value;
+    var all = readExams();
+    var list = all.filter(function(x){
+      if(q && (x.name||'').toLowerCase().indexOf(q) < 0) return false;
+      if(fStage && x.stage !== fStage) return false;
+      if(fType && (x.type||'') !== fType) return false;
+      if(fStatus){
+        var on = (x.status === '启用' || x.status === '已上架');
+        if(fStatus === '启用' && !on) return false;
+        if(fStatus === '未启用' && on) return false;
+      }
+      return true;
+    });
+    var ops = ['预览','发送','撤销发送'];
     var h = '';
     list.forEach(function(x){
-      h += '<div class="ex-item" style="border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer" onclick="toggleItem(this)">' +
+      var on = (x.status === '启用');
+      h += '<div class="ex-item" style="border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff">' +
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' +
-        '<input type="checkbox" class="ex-chk" onclick="event.stopPropagation();exCount()">' +
         '<span style="font-weight:600;color:var(--ink);font-size:14px">' + escHtml(x.name) + '</span>' +
-        '<span style="font-size:11px;color:#c0392b;border:1px solid #c0392b;border-radius:4px;padding:0 5px">' + escHtml(x.status) + '</span>' +
+        '<span style="font-size:11px;color:' + (on ? 'var(--primary)' : '#999') + ';border:1px solid ' + (on ? 'var(--primary)' : '#bbb') + ';border-radius:4px;padding:0 6px">' + (on ? '启用' : '未启用') + '</span>' +
         '</div>' +
-        '<div style="font-size:12px;color:#666;margin-top:4px">单元测试—' + escHtml(x.stage) + '—' + escHtml(x.grade) + '—' + escHtml(x.year) + '</div>' +
-        '<div style="font-size:12px;color:#666;margin-top:3px">大题：' + x.big + '/' + x.big + '　小题：' + x.small + '/' + x.small + '</div>' +
-        '<div style="display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px;min-width:0" onclick="event.stopPropagation()">' +
-        ops.map(function(o){
-          if(o === '预览') return '<button class="copy-ok" style="font-size:12px;padding:5px 10px;flex:none;white-space:nowrap" onclick="event.stopPropagation();previewExam(\'' + String(x.id) + '\')">' + o + '</button>';
-          if(o === '发送') return '<button class="copy-ok" style="font-size:12px;padding:5px 10px;flex:none;white-space:nowrap;border-color:var(--primary);color:var(--primary)" onclick="event.stopPropagation();sendExam(\'' + String(x.id) + '\')">' + o + '</button>';
-          if(o === '撤销发送') return '<button class="copy-ok" style="font-size:12px;padding:5px 10px;flex:none;white-space:nowrap;border-color:#c0392b;color:#c0392b" onclick="event.stopPropagation();unsendExam(\'' + String(x.id) + '\')">' + o + '</button>';
-          return '<button class="copy-ok" style="font-size:12px;padding:5px 10px;flex:none;white-space:nowrap" onclick="examOp(this)">' + o + '</button>';
-        }).join('') +
+        '<div style="font-size:12px;color:#666;margin-top:5px">' + escHtml(x.type||'单元') + '—' + escHtml(x.stage||'') + '—' + escHtml(x.grade||'') + escHtml(x.unit||'') + '</div>' +
+        '<div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">' +
+        '<button class="copy-ok" style="font-size:12px;padding:5px 12px;flex:none;white-space:nowrap" onclick="previewExam(\'' + String(x.id) + '\')">查看</button>' +
+        '<button class="copy-ok" style="font-size:12px;padding:5px 12px;flex:none;white-space:nowrap;border:1.5px solid #c0392b;background:#fdecec;color:#c0392b" onclick="delExam(\'' + String(x.id) + '\')">删除</button>' +
+        (on
+          ? '<button class="copy-ok" style="font-size:12px;padding:5px 12px;flex:none;white-space:nowrap;border:1.5px solid var(--line);background:#fff;color:var(--ink)" onclick="toggleExamStatus(\'' + String(x.id) + '\',false)">不启用</button>'
+          : '<button class="copy-ok" style="font-size:12px;padding:5px 12px;flex:none;white-space:nowrap" onclick="toggleExamStatus(\'' + String(x.id) + '\',true)">启用</button>') +
         '</div>' +
         '</div>';
     });
+    if(!list.length) h = '<p class="t-empty">没有符合条件的试卷</p>';
     $('ex-list').innerHTML = h;
     $('ex-count').innerText = '共 ' + list.length + ' 条';
-    exCount();
+  }
+  var DEL_EXAM_ID = null;
+  function delExam(id){
+    DEL_EXAM_ID = id;
+    $('del-pwd-input').value = '';
+    $('del-pwd-modal').classList.add('open');
+    setTimeout(function(){ $('del-pwd-input').focus(); }, 200);
+  }
+  function confirmDelExam(){
+    var pwd = $('del-pwd-input').value.trim();
+    if(pwd !== '123456'){ toast('管理密码错误，无法删除', 'err'); return; }
+    writeExams(readExams().filter(function(x){ return String(x.id) !== String(DEL_EXAM_ID); }));
+    $('del-pwd-modal').classList.remove('open');
+    renderExam();
+    toast('已删除', 'ok');
+  }
+  function toggleExamStatus(id, on){
+    var list = readExams();
+    list.forEach(function(x){ if(String(x.id) === String(id)) x.status = on ? '启用' : '未启用'; });
+    writeExams(list);
+    renderExam();
+    toast(on ? '已启用' : '已设为不启用', 'ok');
   }
   function renderDetail(){
     var acc = $('d-stu').value;
@@ -2882,14 +3315,46 @@
     });
     $('task-grid').querySelector('thead').innerHTML = hh;
     $('task-grid').querySelector('tbody').innerHTML = bb;
-    $('t-gsummary').textContent = '✔ 全部完成 ｜ ○ 部分完成 ｜ △ 有任务未开始 ｜ — 无任务。点击任意单元格查看该生当日任务。';
+    $('t-gsummary').textContent = '✔ 全部完成 ｜ ○ 部分完成 ｜ △ 有任务未开始 ｜ — 无任务。悬停单元格可查看/修改/删除/复制，点击单元格查看当日任务。';
+  }
+  function delTaskByDay(acc, ymd){
+    if(!confirm('确认删除「' + acc + '」在 ' + ymd + ' 的全部任务？')) return;
+    writeTasks(acc, readTasks(acc).filter(function(t){ return normTask(t).date !== ymd; }));
+    $('day-modal').classList.remove('open');
+    renderTaskGrid();
+    toast('已删除 ' + acc + ' ' + ymd + ' 的任务', 'ok');
+  }
+  var COPY_CTX = { src: [] };
+  function copyTaskByDay(acc, ymd){
+    var src = readTasks(acc).filter(function(t){ return normTask(t).date === ymd; });
+    if(!src.length){ toast('当日没有可复制的任务', 'err'); return; }
+    COPY_CTX.src = src;
+    var sts = studentsList().filter(function(s){ return s !== acc; });
+    $('copy-stu-list').innerHTML = sts.length
+      ? sts.map(function(s){ return '<label style="display:block;padding:10px 6px;cursor:pointer;border-bottom:1px solid #f0f0f0"><input type="checkbox" value="' + escHtml(s) + '" style="margin-right:8px">复制给 ' + escHtml(s) + '</label>'; }).join('')
+      : '<p class="t-empty">暂无可选学生</p>';
+    $('copy-modal').classList.add('open');
+  }
+  function confirmCopyTask(){
+    var targets = Array.prototype.slice.call(document.querySelectorAll('#copy-stu-list input:checked')).map(function(i){ return i.value; });
+    if(!targets.length){ toast('请至少勾选一名学生', 'err'); return; }
+    targets.forEach(function(tg){
+      var arr = readTasks(tg);
+      COPY_CTX.src.forEach(function(t){ var c = JSON.parse(JSON.stringify(t)); c.id = Date.now() + Math.floor(Math.random() * 1000); arr.push(c); });
+      writeTasks(tg, arr);
+    });
+    $('copy-modal').classList.remove('open');
+    renderTaskGrid();
+    toast('已复制给 ' + targets.length + ' 名学生', 'ok');
   }
   function fillClassOptions(){
     var cls = readClasses();
+    var cur = $('tg-class').value;
     var opts = '';
     if(!cls.length){ opts = '<option value="__none__">（未建班级）</option>'; }
     else { cls.forEach(function(c){ opts += '<option value="' + escHtml(c.name) + '">' + escHtml(c.name) + '</option>'; }); }
     $('tg-class').innerHTML = opts;
+    if(cur) $('tg-class').value = cur;
     $('tg-class').style.display = cls.length ? 'inline-block' : 'none';
   }
   function openClassModal(){ tAdminNav('class'); }
@@ -2945,7 +3410,12 @@
   function openDayDetail(acc, ymd){
     var tasks = readTasks(acc).filter(function(t){ return t.date === ymd; });
     var done = readDone(acc);
-    $('day-head').textContent = acc + ' · ' + ymd + ' 的任务（' + tasks.length + ' 个）';
+    $('day-head').innerHTML = escHtml(acc) + ' · ' + ymd + ' 的任务（' + tasks.length + ' 个）'
+      + '<span style="float:right;font-size:13px;display:inline-flex;gap:8px">'
+      + '<button class="btn" style="padding:6px 14px;font-size:13px" onclick="openTaskForm(\'' + acc + '\',\'' + ymd + '\')">修改</button>'
+      + '<button class="btn" style="padding:6px 14px;font-size:13px" onclick="delTaskByDay(\'' + acc + '\',\'' + ymd + '\')">删除</button>'
+      + '<button class="btn" style="padding:6px 14px;font-size:13px" onclick="copyTaskByDay(\'' + acc + '\',\'' + ymd + '\')">复制给他人</button>'
+      + '</span>';
     var h = '';
     if(!tasks.length){ h = '<p class="t-empty">该日无任务</p>'; }
     tasks.forEach(function(t){
@@ -2966,11 +3436,12 @@
   $('tg-kind').addEventListener('change', renderTaskGrid);
   $('tg-class').addEventListener('change', renderTaskGrid);
   $('tg-stu').addEventListener('input', renderTaskGrid);
-  function openTaskForm(pre){
+  function openTaskForm(pre, date){
     $('t-grid-view').style.display = 'none';
     $('t-form-view').style.display = 'block';
     fillOptions($('t-stu'), studentsList());
     if(pre){ var so = $('t-stu').querySelector('option[value="' + pre + '"]'); if(so){ $('t-stu').value = pre; } }
+    if(date){ $('t-date').value = date; }
     initBuilder();
   }
   function closeTaskForm(){
@@ -3026,31 +3497,69 @@
     $('t-summary').textContent = '当前为「' + escHtml(acc) + '」共布置 ' + tasks.length + ' 个任务，学生登录后在「今日任务」中按模块查看并学习。';
   }
   /* ---- 学生端今日任务 ---- */
+  var TASK_START = null;
+  function taskSummaryHtml(){
+    var sec = TASK_START ? Math.max(1, Math.round((Date.now() - TASK_START) / 1000)) : 0;
+    var mm = Math.floor(sec / 60), ss = sec % 60;
+    var durTxt = mm > 0 ? (mm + ' 分 ' + ss + ' 秒') : (ss + ' 秒');
+    var total = 0, doneN = 0;
+    readTasks(ROLE_ACCOUNT).forEach(function(t){
+      t = normTask(t);
+      var dm = readDone(ROLE_ACCOUNT)[t.id] || {};
+      TASK_ORDER.forEach(function(k){ (t.sections[k] || []).forEach(function(it, i){ total++; if(dm['i' + i]) doneN++; }); });
+    });
+    var eff = total ? Math.round(doneN / total * 100) : 100;
+    return '<div style="text-align:center;padding:50px 10px">'
+      + '<div style="font-size:56px">🎉</div>'
+      + '<h2 style="margin:16px 0 6px;font-size:24px">今日任务全部完成</h2>'
+      + '<p style="color:var(--muted)">你已完成老师布置的全部学习任务，真棒！</p>'
+      + '<div style="display:inline-block;text-align:left;margin:28px 0;padding:22px 36px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(60,90,60,.12);font-size:16px">'
+      + '<div style="margin:10px 0">任务有效时长：<b style="color:var(--ok)">' + durTxt + '</b></div>'
+      + '<div style="margin:10px 0">任务完成效率：<b style="color:var(--ok)">' + eff + '%</b></div>'
+      + '</div>'
+      + '<div><button class="go" style="width:220px;padding:14px;font-size:16px" onclick="closeTaskModal(true)">知道了</button></div>'
+      + '</div>';
+  }
   function openTaskModal(){
     var acc = ROLE_ACCOUNT || 'student1';
     var tasks = readTasks(acc);
+    var pend = forcePendingTask(ROLE_ACCOUNT);
     var h = '';
     if(!tasks.length){
       h = '<div class="admin-empty" style="min-height:120px"><b>今日暂无任务</b><p>教师还没有给你布置任务，先去学习板块自主学习吧。</p></div>';
+    } else if(!pend){
+      h = taskSummaryHtml();
     } else {
       tasks.forEach(function(t){
         t = normTask(t);
+        var doneMap = readDone(acc)[t.id] || {};
         h += '<div class="task-sec" style="margin-top:10px"><div class="task-sec-h">任务 ' + escHtml(t.date || '—') + (t.force ? '（强制）' : '（非强制）') + '</div>';
         TASK_ORDER.forEach(function(k){
           var items = t.sections[k];
           if(!items.length) return;
           h += '<p class="t-empty" style="margin:6px 0 0 0"><b>' + TASK_KINDS[k] + '</b></p>';
           items.forEach(function(it, i){
-            h += '<div class="task-item"><button class="go" onclick="goItem(' + t.id + ',\'' + k + '\',' + i + ')">去学习</button><b>' + escHtml(it.name) + '</b><p>' + escHtml(it.ver) + ' · ' + escHtml(it.grade) + ' · ' + escHtml(it.unit) + (it.est ? ' ｜' + escHtml(it.est) : '') + '</p></div>';
+            var isDone = !!doneMap['i' + i];
+            var ctrl = isDone
+              ? '<span class="done-tag" style="color:var(--ok);font-weight:700;font-size:14px">✓ 已完成</span>'
+              : '<button class="go" onclick="goItem(' + t.id + ',\'' + k + '\',' + i + ')">去学习</button>';
+            h += '<div class="task-item"' + (isDone ? ' style="opacity:.75"' : '') + '>' + ctrl + '<b>' + escHtml(it.name) + '</b><p>' + escHtml(it.ver) + ' · ' + escHtml(it.grade) + ' · ' + escHtml(it.unit) + (it.est ? ' ｜' + escHtml(it.est) : '') + '</p></div>';
           });
         });
         h += '</div>';
       });
     }
     $('task-list').innerHTML = h;
+    // 强制模式：有待完成任务时隐藏关闭按钮，遮罩点击也不关闭
+    var pend = forcePendingTask(ROLE_ACCOUNT);
+    var closeBtn = $('task-modal').querySelector('.close');
+    if(closeBtn) closeBtn.style.display = pend ? 'none' : '';
     $('task-modal').classList.add('open');
   }
-  function closeTaskModal(){ $('task-modal').classList.remove('open'); }
+  function closeTaskModal(force){
+    if(!force && forcePendingTask(ROLE_ACCOUNT)){ toast('请先完成今日布置的学习任务，完成后才能自由学习', 'err'); openTaskModal(true); return; }
+    $('task-modal').classList.remove('open');
+  }
   function findTaskById(acc, id){ var a = readTasks(acc).filter(function(t){ return t.id === id; }); return a.length ? a[0] : null; }
   function goTask(id){
     var acc = ROLE_ACCOUNT || 'student1';
@@ -3068,7 +3577,7 @@
     t = normTask(t);
     var item = (t.sections[k] && t.sections[k][idx]) ? t.sections[k][idx] : null;
     if(!item){ toast('该学习内容不存在', 'err'); return; }
-    closeTaskModal();
+    closeTaskModal(true);
     CUR_VER = item.ver; CUR_GRADE = item.grade;
     $('study-ver-sel').value = item.ver;
     $('study-grade-sel').value = item.grade;
@@ -3079,10 +3588,42 @@
     if(!$('study-page').classList.contains('active')){ $('card').classList.add('hidden'); $('study-page').classList.add('active'); }
     var dd = readDone(acc);
     if(!dd[taskId]) dd[taskId] = {};
-    dd[taskId]['i' + idx] = true;
+    CUR_TASK = { taskId: taskId, k: k, idx: idx };   // 进入不标记完成，学完/测试过关后才标记
     writeDone(acc, dd);
-    TASK_LIMIT = { count: item.count || 0, test: item.test !== false };
+    var prog = dd[taskId]['p' + idx] || 0;           // 断点续学：已学个数
+    TASK_LIMIT = { count: item.count || 0, test: item.test !== false, offset: prog };
     enterModule(item.fn, item.name);
+  }
+  // 当前正在做的任务项；真正完成（学完或测试过关）时调用，标记该 item 完成
+  var CUR_TASK = null;
+  function markTaskDone(){
+    if(!CUR_TASK) return;
+    var acc = ROLE_ACCOUNT;
+    var dd = readDone(acc);
+    if(!dd[CUR_TASK.taskId]) dd[CUR_TASK.taskId] = {};
+    dd[CUR_TASK.taskId]['i' + CUR_TASK.idx] = true;
+    writeDone(acc, dd);
+    CUR_TASK = null;
+    // 全部强制任务完成：弹出今日任务小结
+    if(ROLE === '学生' && !forcePendingTask(acc)){
+      setTimeout(function(){ openTaskModal(true); }, 500);
+    }
+  }
+  // 回到学习首页后：若今日强制任务仍有未完成项，重新弹出锁定
+  function backToHomeCheck(){
+    if(ROLE === '学生' && forcePendingTask(ROLE_ACCOUNT)){ setTimeout(function(){ openTaskModal(true); }, 250); }
+  }
+  // 中途退出时记录该任务项已学个数，供下次断点续学
+  function saveTaskProgress(){
+    if(!CUR_TASK || !TASK_LIMIT) return;
+    var off = TASK_LIMIT.offset || 0;
+    var idx = (typeof LEARN !== 'undefined' && LEARN) ? (LEARN.idx || 0) : 0;
+    var prog = off + idx;
+    if(TASK_LIMIT.count > 0 && prog > TASK_LIMIT.count) prog = TASK_LIMIT.count;
+    var dd = readDone(ROLE_ACCOUNT);
+    if(!dd[CUR_TASK.taskId]) dd[CUR_TASK.taskId] = {};
+    dd[CUR_TASK.taskId]['p' + CUR_TASK.idx] = prog;
+    writeDone(ROLE_ACCOUNT, dd);
   }
 
   /* ===================== 校长内容管理（按 教材·年级 维度） ===================== */
@@ -3414,6 +3955,7 @@
     if(!p){ toast('请输入密码', 'err'); return; }
     var demo = { student1:'学生', teacher1:'教师', principal1:'校长' };
     if(demo[a] && p === '123456'){
+      try{ localStorage.setItem('auto_login', JSON.stringify({ a: a, p: p })); }catch(e){}
       ROLE = demo[a]; ROLE_ACCOUNT = a;
       document.querySelectorAll('.tabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.role === ROLE); });
       toast(ROLE + '登录成功，欢迎回来！', 'ok');
@@ -3579,7 +4121,10 @@
     $('listen-badge').style.display = isListen ? 'flex' : 'none';
     $('word-en').classList.toggle('sent', isSent);
     var raw = CUR_BANK.slice();
-    if(TASK_LIMIT && TASK_LIMIT.count > 0){ raw = raw.slice(0, TASK_LIMIT.count); }
+    if(TASK_LIMIT && TASK_LIMIT.count > 0){
+      var off = TASK_LIMIT.offset || 0;
+      raw = raw.slice(off, off + (TASK_LIMIT.count - off));
+    }
     LEARN.words = raw.map(function(w){ return {word:w[0], cn:w[1], sent:w[2] || '', options:shuffle(buildOptions(w[1]))}; });
     LEARN.idx = 0; LEARN.total = LEARN.words.length; LEARN.wrongMap = {};
     $('rev-badge-word').textContent = '待复习 0';
@@ -3588,11 +4133,13 @@
     loadWord();
   }
   function exitWord(){
+    saveTaskProgress();
     TASK_LIMIT = null;
     speechSynthesis.cancel && speechSynthesis.cancel();
     clearInterval(LEARN.timerInt);
     $('view-word').classList.remove('active');
     $('study-page').classList.add('active');
+    backToHomeCheck();
   }
   function loadWord(){
     if(LEARN.idx >= LEARN.total){ finishUnit(); return; }
@@ -3717,6 +4264,7 @@
     $('view-copy').classList.remove('active');
     if(TASK_LIMIT && TASK_LIMIT.test === false){
       TASK_LIMIT = null;
+      markTaskDone();
       $('study-page').classList.add('active');
       toast('本单元学习完成！');
       return;
@@ -4025,6 +4573,7 @@
     $('result-msg').textContent = msg;
     $('result-score').style.color = style === 'ok' ? 'var(--ok)' : 'var(--danger)';
     $('result-retest').style.display = TEST.wrongPool.length ? 'inline-block' : 'none';
+    if(score >= 80){ markTaskDone(); }   // 测试过关才算该任务项完成
   }
   function retestWrong(){
     $('test-result').style.display = 'none';
@@ -4037,6 +4586,7 @@
     speechSynthesis.cancel && speechSynthesis.cancel();
     $('view-test').classList.remove('active');
     $('study-page').classList.add('active');
+    backToHomeCheck();
   }
 
   /* ===================== 单词跟读（语音评测） ===================== */
@@ -4429,7 +4979,10 @@
     CUR_BANK = bank;
     MODE = isSent ? 'scopy' : 'copy';
     var raw = CUR_BANK.slice();
-    if(TASK_LIMIT && TASK_LIMIT.count > 0){ raw = raw.slice(0, TASK_LIMIT.count); }
+    if(TASK_LIMIT && TASK_LIMIT.count > 0){
+      var off = TASK_LIMIT.offset || 0;
+      raw = raw.slice(off, off + (TASK_LIMIT.count - off));
+    }
     LEARN.words = raw.map(function(w){
       var form = '';
       var m = w[2] ? w[2].match(/<b>(.*?)<\/b>/) : null;
@@ -4446,11 +4999,13 @@
   function startWordCopy(){ startCopy(bankWords(), false); }
   function startSentenceCopy(){ startCopy(bankSents(), true); }
   function exitCopy(){
+    saveTaskProgress();
     TASK_LIMIT = null;
     clearInterval(COPY.timerInt);
     speechSynthesis.cancel && speechSynthesis.cancel();
     $('view-copy').classList.remove('active');
     $('study-page').classList.add('active');
+    backToHomeCheck();
   }
   function loadCopyWord(){
     if(LEARN.idx >= LEARN.total){ finishUnit(); return; }
@@ -4695,12 +5250,21 @@
 <script>
 (function(){
   // 学生端视图被误嵌套进教师后台容器时，提升为 body 直子以保证显示
-  ['study-page','view-text','view-word','view-read','view-copy','view-test'].forEach(function(id){
+  ['study-page','view-text','view-word','view-read','view-copy','view-test','task-modal','alpha-modal'].forEach(function(id){
     var el = document.getElementById(id);
     if(el && el.parentNode && el.parentNode !== document.body && el.parentNode.id === 'teacher-page'){
       document.body.appendChild(el);
     }
   });
+  // 刷新后自动登录（上次登录成功已记住账号密码）
+  try{
+    var s = JSON.parse(localStorage.getItem('auto_login') || 'null');
+    if(s && s.a && s.p){
+      $('login-account').value = s.a;
+      $('login-pass').value = s.p;
+      setTimeout(doLogin, 300);
+    }
+  }catch(e){}
 })();
 </script>
 </body>
