@@ -107,7 +107,7 @@
   .agree a{color:var(--primary);text-decoration:none}
 
   /* 学习内容选择弹窗 */
-  .modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s}
+  .modal{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s;background:rgba(0,0,0,.3)}
   .modal.open,.modal.active{opacity:1;pointer-events:auto}
   .modal-mask{position:absolute;inset:0;background:rgba(35,48,79,.48);backdrop-filter:blur(3px)}
   .modal-box{position:relative;z-index:1;width:100%;max-width:360px;background:#fff;border-radius:20px;padding:26px 26px 24px;box-shadow:0 24px 60px rgba(30,40,80,.35);transform:translateY(16px) scale(.98);transition:.25s}
@@ -949,8 +949,20 @@
       <div class="side-group">学习监控</div>
       <button class="anav" data-k="daily" onclick="tAdminNav('daily')">日学习报告</button>
       <button class="anav" data-k="weekly" onclick="tAdminNav('weekly')">周学习报告</button>
-      <button class="anav" data-k="prog" onclick="tAdminNav('prog')">整班课程进度</button>
-      <button class="anav" data-k="cnt" onclick="tAdminNav('cnt')">整班学习数量</button>
+      <div style="position:relative">
+        <button class="anav" data-k="prog" onmouseover="this.nextElementSibling.style.display='block'" onmouseout="this.nextElementSibling.style.display='none'">词汇管理</button>
+        <div style="display:none;position:absolute;left:100%;top:0;background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:8px;min-width:120px;z-index:100" onmouseover="this.style.display='block'" onmouseout="this.style.display='none'">
+          <div style="padding:8px 12px;cursor:pointer;font-size:14px;border-radius:6px" onclick="openVocabModal()">词汇创建</div>
+          <div style="padding:8px 12px;cursor:pointer;font-size:14px;border-radius:6px" onclick="viewVocabList()">查阅已建</div>
+        </div>
+      </div>
+      <div style="position:relative">
+        <button class="anav" data-k="cnt" onmouseover="this.nextElementSibling.style.display='block'" onmouseout="this.nextElementSibling.style.display='none'">句子管理</button>
+        <div style="display:none;position:absolute;left:100%;top:0;background:#fff;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:8px;min-width:120px;z-index:100" onmouseover="this.style.display='block'" onmouseout="this.style.display='none'">
+          <div style="padding:8px 12px;cursor:pointer;font-size:14px;border-radius:6px" onclick="openSentenceModal()">句子创建</div>
+          <div style="padding:8px 12px;cursor:pointer;font-size:14px;border-radius:6px" onclick="viewSentenceList()">查阅已建</div>
+        </div>
+      </div>
       <button class="anav" data-k="exam" onclick="tAdminNav('exam')">试卷管理</button>
     </div>
     <div class="admin-main">
@@ -1090,7 +1102,7 @@
     <input id="del-pwd-input" type="password" placeholder="管理密码" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;outline:none;margin-bottom:14px">
     <div class="imp-actions">
       <button class="copy-ok sec" onclick="$('del-pwd-modal').classList.remove('open')">取消</button>
-      <button class="copy-ok" onclick="confirmDelExam()">确认删除</button>
+      <button class="copy-ok" onclick="onDelPwdConfirm()">确认删除</button>
     </div>
   </div></div>
   <!-- 复制任务给他人：学生勾选 -->
@@ -1267,6 +1279,54 @@
       <div class="imp-actions">
         <button class="copy-ok sec" style="background:#fff;color:var(--ink);border:1.5px solid var(--line)" onclick="closeCreateExam()">取消</button>
         <button class="copy-ok" onclick="submitCreateExam()">开始录入题目</button>
+      </div>
+    </div></div>
+    <div class="modal" id="vocab-modal"><div class="modal-box" style="max-width:480px">
+      <div class="modal-title" style="font-size:16px">创建词汇</div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">阶段</div>
+        <label style="font-size:13px;margin-right:14px"><input type="radio" name="vc-stage" value="小学" checked> 小学</label>
+        <label style="font-size:13px;margin-right:14px"><input type="radio" name="vc-stage" value="初中"> 初中</label>
+        <label style="font-size:13px"><input type="radio" name="vc-stage" value="高中"> 高中</label>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">年级</div>
+          <select id="vc-grade" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>一年级</option><option>二年级</option><option>三年级</option><option>四年级</option><option>五年级</option><option>六年级</option>
+            <option>七年级</option><option>八年级</option><option>九年级</option>
+            <option>高一</option><option>高二</option><option>高三</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">版本</div>
+          <select id="vc-ver" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>人教版(PEP)</option><option>外研版</option><option>译林版</option><option>湘少版</option><option>科普版</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">册别</div>
+          <select id="vc-book" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>上册</option><option>下册</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">单元</div>
+          <select id="vc-unit" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;background:#fff;outline:none">
+            <option>Unit 1</option><option>Unit 2</option><option>Unit 3</option><option>Unit 4</option><option>Unit 5</option>
+            <option>Unit 6</option><option>Unit 7</option><option>Unit 8</option><option>Unit 9</option><option>Unit 10</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:13px;color:var(--ink-soft);margin-bottom:5px">单元分组名</div>
+        <input id="vc-group" placeholder="如：重点单词" style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px;font-family:inherit;font-size:14px;outline:none">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="copy-ok sec" style="background:#fff;color:var(--ink);border:1.5px solid var(--line)" onclick="closeVocabModal()">取消</button>
+        <button class="copy-ok" onclick="startVocabImport()">开始导入</button>
       </div>
     </div></div>
     <div class="modal" id="exedit-modal">
@@ -1521,7 +1581,7 @@
           <span class="rate-val" id="learn-rate-val">1.0x</span>
         </div>
       </div>
-      <div class="sent-box" id="word-sent-box">文中原句：<span id="word-sent"></span></div>
+      <div class="sent-box" id="word-sent-box">例句：<span id="word-sent"></span></div>
       <div class="count-box">
         <span class="count-num" id="word-timer">6</span>
         <div class="count-bar"><div class="count-fill" id="count-fill"></div></div>
@@ -1566,7 +1626,7 @@
           <span class="rate-val" id="read-rate-val">1.0x</span>
         </div>
       </div>
-      <div class="sent-box" id="read-sent-box">文中原句：<span id="read-sent"></span></div>
+      <div class="sent-box" id="read-sent-box">例句：<span id="read-sent"></span></div>
       <div class="read-ring" id="read-ring">
         <svg viewBox="0 0 166 64" width="166" height="64" aria-hidden="true">
           <rect class="rr-bg" x="8" y="6" width="150" height="52" rx="16"/>
@@ -1606,7 +1666,7 @@
       <div class="word-en" id="copy-en">—</div>
       <div class="copy-ph" id="copy-ph"></div>
       <div class="copy-cn" id="copy-cn"></div>
-      <div class="sent-box" id="copy-sent-box" style="display:none">
+      <div class="sent-box" id="copy-sent-box" style="display:none;font-size:16px;font-weight:600;color:var(--primary)">
         <span id="copy-sent-label">同步例句：</span><span id="copy-sent-text"></span>
         <div class="copy-fill-row">
           <input id="copy-fill-in" placeholder="填入该单词的正确形式（区分大小写）" onkeydown="if(event.key==='Enter'){fillSubmit()}">
@@ -2830,6 +2890,258 @@
     $('ce-modal').classList.add('open');
   }
   function closeCreateExam(){ $('ce-modal').classList.remove('open'); }
+  function openVocabModal(){ SENT_MODE = false; document.querySelector('#vocab-modal .modal-title').textContent='创建词汇'; $('vocab-modal').classList.add('open'); }
+  function closeVocabModal(){ $('vocab-modal').classList.remove('open'); }
+  var SENT_MODE = false;
+  function openSentenceModal(){ SENT_MODE = true; document.querySelector('#vocab-modal .modal-title').textContent='创建句子'; $('vocab-modal').classList.add('open'); }
+  var VOCAB_ALL_MODE = false;
+  function viewVocabList(){
+    VOCAB_ALL_MODE = true;
+    var list = readVocab();
+    var page = $('vocab-page');
+    if(!page){
+      page = document.createElement('div');
+      page.id = 'vocab-page';
+      page.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:#f5f7f5;overflow:auto';
+      document.body.appendChild(page);
+      document.body.appendChild(document.querySelector('#del-pwd-modal'));
+    }
+    var h = '<div style="background:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);position:sticky;top:0;z-index:2">'
+      + '<button onclick="closeVocabPage()" style="border:1.5px solid var(--line);background:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:inherit">返回</button>'
+      + '<span style="font-weight:600;font-size:16px">已建词汇（' + list.length + '条）</span>'
+      + '<button onclick="clearAllVocab()" style="margin-left:auto;border:1.5px solid #c0392b;background:#fdecec;color:#c0392b;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">清空全部</button></div>';
+    h += '<div id="vocab-list" style="max-width:900px;margin:20px auto">';
+    if(!list.length) h += '<div style="text-align:center;color:#999;padding:60px 0">暂无词汇</div>';
+    list.forEach(function(v, i){
+      h += '<div class="vocab-row" style="background:#fff;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+        + '<div style="flex:1"><b>' + escHtml(v.word) + '</b>'
+        + (v.ipa ? ' <span style="color:#888;font-size:13px;margin-left:8px">' + escHtml(v.ipa) + '</span>' : '')
+        + (v.meaning ? ' <span style="color:#666;font-size:13px;margin-left:12px">' + escHtml(v.meaning) + '</span>' : '')
+        + (v.sent ? ' <span style="color:#aaa;font-size:12px;margin-left:12px">例句: ' + escHtml(v.sent) + '</span>' : '')
+        + ' <span style="color:#aaa;font-size:12px;margin-left:12px">' + escHtml(v.grade||'') + ' ' + escHtml(v.unit||'') + '</span></div>'
+        + '<button onclick="editVocabPwd(' + i + ')" style="border:1.5px solid var(--line);background:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">修改</button>'
+        + '<button onclick="delVocabGlobal(' + i + ')" style="border:1.5px solid #c0392b;background:#fdecec;color:#c0392b;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">删除</button>'
+        + '</div>';
+    });
+    h += '</div>';
+    page.innerHTML = h;
+    page.style.display = 'block';
+  }
+  function editVocabPwd(i){
+    VOCAB_EDIT_IDX = i;
+    var arr = readVocab();
+    var v = arr[i];
+    var rows = document.querySelectorAll('#vocab-page .vocab-row');
+    if(rows[i]){
+      rows[i].innerHTML =
+        '<input value="'+escHtml(v.word)+'" id="ve-word" style="width:100px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px">'
+        + '<input value="'+escHtml(v.ipa||'')+'" id="ve-ipa" style="width:110px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px">'
+        + '<input value="'+escHtml(v.meaning||'')+'" id="ve-meaning" style="width:140px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px">'
+        + '<input value="'+escHtml(v.sent||'')+'" id="ve-sent" style="flex:1;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px" placeholder="例句">'
+        + '<button onclick="saveVocabEdit()" style="border:none;background:var(--primary);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">保存</button>'
+        + '<button onclick="viewVocabList()" style="border:1.5px solid var(--line);background:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;margin-left:6px">取消</button>';
+    }
+    // 禁用其他行的按钮
+    rows.forEach(function(r, idx){
+      if(idx !== i){
+        r.querySelectorAll('button').forEach(function(b){ b.disabled = true; b.style.opacity = '.4'; });
+      }
+    });
+  }
+  var VOCAB_EDIT_IDX = -1;
+  function saveVocabEdit(){
+    var arr = readVocab();
+    arr[VOCAB_EDIT_IDX].word = $('ve-word').value;
+    arr[VOCAB_EDIT_IDX].ipa = $('ve-ipa').value;
+    arr[VOCAB_EDIT_IDX].meaning = $('ve-meaning').value;
+    arr[VOCAB_EDIT_IDX].sent = $('ve-sent') ? $('ve-sent').value : '';
+    writeVocab(arr); viewVocabList(); toast('已修改', 'ok');
+  }
+  var VOCAB_EDIT_MODE = false;
+  function clearAllVocab(){
+    VOCAB_DEL_IDX = -1;
+    VOCAB_DEL_ALL = true;
+    VOCAB_EDIT_MODE = false;
+    $('del-pwd-input').value='';
+    document.querySelector('#del-pwd-modal .modal-title').textContent='删除验证';
+    document.querySelector('#del-pwd-modal div[style*="color:var(--ink-soft)"]').textContent='清空全部需输入管理密码：';
+    document.querySelector('#del-pwd-modal .imp-actions .copy-ok:last-child').textContent='确认清空';
+    $('del-pwd-modal').classList.add('open');
+  }
+  function viewSentenceList(){
+    SENT_MODE = true;
+    VOCAB_ALL_MODE = true;
+    var list = readSent();
+    var page = $('vocab-page');
+    if(!page){
+      page = document.createElement('div');
+      page.id = 'vocab-page';
+      page.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:#f5f7f5;overflow:auto';
+      document.body.appendChild(page);
+      document.body.appendChild(document.querySelector('#del-pwd-modal'));
+    }
+    var h = '<div style="background:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);position:sticky;top:0;z-index:2">'
+      + '<button onclick="closeVocabPage()" style="border:1.5px solid var(--line);background:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:inherit">返回</button>'
+      + '<span style="font-weight:600;font-size:16px">已建句子（' + list.length + '条）</span>'
+      + '<button onclick="clearAllVocab()" style="margin-left:auto;border:1.5px solid #c0392b;background:#fdecec;color:#c0392b;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">清空全部</button></div>';
+    h += '<div id="vocab-list" style="max-width:900px;margin:20px auto">';
+    if(!list.length) h += '<div style="text-align:center;color:#999;padding:60px 0">暂无句子</div>';
+    list.forEach(function(v, i){
+      h += '<div class="vocab-row" style="background:#fff;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+        + '<div style="flex:1"><b>' + escHtml(v.sent||v.word||'') + '</b>'
+        + (v.meaning ? ' <span style="color:#666;font-size:13px;margin-left:12px">' + escHtml(v.meaning) + '</span>' : '')
+        + (v.blank ? ' <span style="color:#aaa;font-size:12px;margin-left:12px">挖空: ' + escHtml(v.blank) + '</span>' : '')
+        + ' <span style="color:#aaa;font-size:12px;margin-left:12px">' + escHtml(v.grade||'') + ' ' + escHtml(v.unit||'') + '</span></div>'
+        + '<button onclick="editVocab(' + i + ')" style="border:1.5px solid var(--line);background:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">修改</button>'
+        + '<button onclick="delVocabGlobal(' + i + ')" style="border:1.5px solid #c0392b;background:#fdecec;color:#c0392b;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">删除</button>'
+        + '</div>';
+    });
+    h += '</div>';
+    page.innerHTML = h;
+    page.style.display = 'block';
+  }
+  function startVocabImport(){
+    closeVocabModal();
+    var info = { stage: document.querySelector('input[name="vc-stage"]:checked').value, grade:$('vc-grade').value, ver:$('vc-ver').value, book:$('vc-book').value, unit:$('vc-unit').value, group:$('vc-group').value };
+    var page = $('vocab-page');
+    if(!page){
+      page = document.createElement('div');
+      page.id = 'vocab-page';
+      page.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:#f5f7f5;overflow:auto';
+      document.body.appendChild(page);
+      document.body.appendChild(document.querySelector('#del-pwd-modal'));
+    }
+    page.innerHTML = '<div style="background:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);position:sticky;top:0;z-index:2">'
+      + '<button onclick="closeVocabPage()" style="border:1.5px solid var(--line);background:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:inherit">返回</button>'
+      + '<span style="font-weight:600;font-size:16px">' + (SENT_MODE?'句子导入':'词汇导入') + ' - ' + escHtml(info.group||info.unit) + '</span>'
+      + '<span style="color:#888;font-size:13px;margin-left:auto">' + info.stage + ' · ' + info.grade + ' · ' + info.ver + ' · ' + info.book + ' · ' + info.unit + '</span>'
+      + '<label style="background:var(--primary);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">上传CSV<input type="file" accept=".csv" style="display:none" onchange="uploadVocabCSV(this)"></label>'
+      + '<button onclick="clearVocab()" style="border:1.5px solid #c0392b;background:#fdecec;color:#c0392b;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">清空</button>'
+      + '</div>'
+      + '<div id="vocab-list" style="max-width:900px;margin:20px auto"></div>';
+    page.style.display = 'block';
+    VOCAB_INFO = info;
+    renderVocabList();
+  }
+  function closeVocabPage(){ $('vocab-page').style.display = 'none'; }
+  var VOCAB_DEL_IDX = -1, VOCAB_DEL_ALL = false;
+  function delVocabPrompt(i){ VOCAB_DEL_IDX = i; VOCAB_DEL_ALL = false; $('del-pwd-input').value=''; $('del-pwd-modal').classList.add('open'); }
+  function delVocabGlobal(i){ VOCAB_DEL_IDX = i; VOCAB_DEL_ALL = false; VOCAB_EDIT_MODE = false; $('del-pwd-input').value=''; document.querySelector('#del-pwd-modal .modal-title').textContent='删除验证'; document.querySelector('#del-pwd-modal div[style*="color:var(--ink-soft)"]').textContent='删除词汇需输入管理密码：'; document.querySelector('#del-pwd-modal .imp-actions .copy-ok:last-child').textContent='确认删除'; $('del-pwd-modal').classList.add('open'); }
+  function clearVocab(){ VOCAB_DEL_IDX = -1; VOCAB_DEL_ALL = true; $('del-pwd-input').value=''; $('del-pwd-modal').classList.add('open'); }
+  function confirmVocabDel(){
+    var p = $('del-pwd-input').value;
+    if(p !== '123456'){ toast('密码错误', 'err'); return; }
+    $('del-pwd-modal').classList.remove('open');
+    var arr = SENT_MODE ? readSent() : readVocab();
+    if(VOCAB_DEL_ALL){
+      arr = [];
+    } else {
+      var list = arr;
+      if(VOCAB_INFO) list = arr.filter(function(v){ return v.grade===VOCAB_INFO.grade && v.unit===VOCAB_INFO.unit; });
+      var v = list[VOCAB_DEL_IDX];
+      var idx = arr.indexOf(v);
+      if(idx >= 0) arr.splice(idx, 1);
+    }
+    if(SENT_MODE) writeSent(arr); else writeVocab(arr);
+    if(VOCAB_ALL_MODE){ if(SENT_MODE) viewSentenceList(); else viewVocabList(); } else renderVocabList();
+    toast('已完成', 'ok');
+  }
+  function onDelPwdConfirm(){ confirmVocabDel(); }
+  var VOCAB_INFO = null;
+  function readVocab(){ try{ return JSON.parse(localStorage.getItem('english_vocab')||'[]'); }catch(e){ return []; } }
+  function writeVocab(a){ localStorage.setItem('english_vocab', JSON.stringify(a)); }
+  function readSent(){ try{ return JSON.parse(localStorage.getItem('english_sentences')||'[]'); }catch(e){ return []; } }
+  function writeSent(a){ localStorage.setItem('english_sentences', JSON.stringify(a)); }
+  function renderVocabList(){
+    var list = SENT_MODE ? readSent() : readVocab();
+    if(VOCAB_INFO) list = list.filter(function(v){ return v.grade===VOCAB_INFO.grade && v.unit===VOCAB_INFO.unit; });
+    var h = '';
+    if(!list.length) h = '<div style="text-align:center;color:#999;padding:60px 0">暂无' + (SENT_MODE?'句子':'词汇') + '，请上传CSV导入</div>';
+    list.forEach(function(v, i){
+      h += '<div class="vocab-row" style="background:#fff;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)">'
+        + '<div style="flex:1"><b>' + escHtml(SENT_MODE ? (v.sent||'') : (v.word||'')) + '</b>'
+        + (v.ipa ? ' <span style="color:#888;font-size:13px;margin-left:8px">' + escHtml(v.ipa) + '</span>' : '')
+        + (v.meaning ? ' <span style="color:#666;font-size:13px;margin-left:12px">' + escHtml(v.meaning) + '</span>' : '')
+        + '</div>'
+        + '<button onclick="editVocab(' + i + ')" style="border:1.5px solid var(--line);background:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">修改</button>'
+        + '<button onclick="delVocabGlobal(' + i + ')" style="border:1.5px solid #c0392b;background:#fdecec;color:#c0392b;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">删除</button>'
+        + '</div>';
+    });
+    $('vocab-list').innerHTML = h;
+  }
+  function uploadVocabCSV(input){
+    var f = input.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(e){
+      var lines = e.target.result.split(/\r?\n/).filter(function(l){ return l.trim(); });
+      if(SENT_MODE){
+        var arr = readSent();
+        lines.forEach(function(line){
+          var parts = line.split(/[,，]/);
+          if(parts.length >= 3 && parts[1] && parts[1].trim()) arr.push({ sent:parts[1].trim(), meaning:(parts[2]||'').trim(), blank:(parts[3]||'').trim(), grade:VOCAB_INFO.grade, unit:VOCAB_INFO.unit, ver:VOCAB_INFO.ver });
+        });
+        writeSent(arr);
+      } else {
+        var arr = readVocab();
+        lines.forEach(function(line){
+          var parts = line.split(/[,，]/);
+          if(parts.length >= 2 && parts[1] && parts[1].trim()) arr.push({ word:parts[1].trim(), ipa:(parts[2]||'').trim(), meaning:(parts[3]||'').trim(), sent:(parts[4]||'').trim(), grade:VOCAB_INFO.grade, unit:VOCAB_INFO.unit, ver:VOCAB_INFO.ver });
+        });
+        writeVocab(arr);
+      }
+      renderVocabList(); toast('导入成功', 'ok');
+    };
+    r.readAsText(f, 'utf-8');
+  }
+  function delVocabPrompt(i){ VOCAB_DEL_IDX = i; VOCAB_DEL_ALL = false; $('del-pwd-input').value=''; $('del-pwd-modal').classList.add('open'); }
+  function delVocabGlobal(i){ VOCAB_DEL_IDX = i; VOCAB_DEL_ALL = false; VOCAB_EDIT_MODE = false; $('del-pwd-input').value=''; document.querySelector('#del-pwd-modal .modal-title').textContent='删除验证'; document.querySelector('#del-pwd-modal div[style*="color:var(--ink-soft)"]').textContent='删除词汇需输入管理密码：'; document.querySelector('#del-pwd-modal .imp-actions .copy-ok:last-child').textContent='确认删除'; $('del-pwd-modal').classList.add('open'); }
+  var VOCAB_EDIT_IDX = -1, VOCAB_EDIT_MODE = false;
+  function editVocab(i){
+    if(VOCAB_EDIT_MODE) return;
+    VOCAB_EDIT_MODE = true;
+    var list = SENT_MODE ? readSent() : readVocab();
+    if(VOCAB_INFO) list = list.filter(function(v){ return v.grade===VOCAB_INFO.grade && v.unit===VOCAB_INFO.unit; });
+    VOCAB_EDIT_IDX = i;
+    var rows = document.querySelectorAll('#vocab-list .vocab-row');
+    var row = rows[i]; if(!row) return;
+    var v = list[i];
+    if(SENT_MODE){
+      row.innerHTML =
+        '<input value="'+escHtml(v.sent||'')+'" id="ve-word" style="flex:1;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px">'
+        + '<input value="'+escHtml(v.meaning||'')+'" id="ve-meaning" style="width:140px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px">'
+        + '<input value="'+escHtml(v.blank||'')+'" id="ve-sent" style="width:100px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px" placeholder="挖空">'
+        + '<button onclick="saveVocabEdit()" style="border:none;background:var(--primary);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">保存</button>'
+        + '<button onclick="renderVocabList()" style="border:1.5px solid var(--line);background:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;margin-left:6px">取消</button>';
+    } else {
+      row.innerHTML =
+        '<input value="'+escHtml(v.word)+'" id="ve-word" style="width:100px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px">'
+        + '<input value="'+escHtml(v.ipa||'')+'" id="ve-ipa" style="width:110px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px">'
+        + '<input value="'+escHtml(v.meaning||'')+'" id="ve-meaning" style="width:140px;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px">'
+        + '<input value="'+escHtml(v.sent||'')+'" id="ve-sent" style="flex:1;border:1.5px solid var(--line);border-radius:6px;padding:6px;font-family:inherit;font-size:14px;margin-left:6px" placeholder="例句">'
+        + '<button onclick="saveVocabEdit()" style="border:none;background:var(--primary);color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">保存</button>'
+        + '<button onclick="renderVocabList()" style="border:1.5px solid var(--line);background:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;margin-left:6px">取消</button>';
+    }
+  }
+  function saveVocabEdit(){
+    var arr = SENT_MODE ? readSent() : readVocab();
+    var list = arr;
+    if(VOCAB_INFO) list = arr.filter(function(v){ return v.grade===VOCAB_INFO.grade && v.unit===VOCAB_INFO.unit; });
+    var v = list[VOCAB_EDIT_IDX]; if(!v) return;
+    var idx = arr.indexOf(v);
+    if(SENT_MODE){
+      arr[idx].sent = $('ve-word').value;
+      arr[idx].meaning = $('ve-meaning').value;
+      arr[idx].blank = $('ve-sent') ? $('ve-sent').value : '';
+      writeSent(arr);
+    } else {
+      arr[idx].word = $('ve-word').value;
+      arr[idx].ipa = $('ve-ipa').value;
+      arr[idx].meaning = $('ve-meaning').value;
+      arr[idx].sent = $('ve-sent') ? $('ve-sent').value : '';
+      writeVocab(arr);
+    }
+    VOCAB_EDIT_IDX = -1; VOCAB_EDIT_MODE = false; renderVocabList();
+  }
   function ceStep(d, which){
     var el = $(which === 'big' ? 'ce-big' : 'ce-small');
     el.value = Math.max(1, parseInt(el.value||1) + d);
@@ -4052,8 +4364,24 @@
       CUSTOM.sents = JSON.parse(localStorage.getItem('english_custom_sents') || 'null');
     }catch(e){ CUSTOM.words = null; CUSTOM.sents = null; }
   }
-  function bankWords(){ var v = readBank('words', CUR_VER, CUR_GRADE); return v.length ? v : WORD_BANK; }
-  function bankSents(){ var v = readBank('sents', CUR_VER, CUR_GRADE); return v.length ? v : SENT_BANK; }
+  function bankWords(){
+    var v = readBank('words', CUR_VER, CUR_GRADE);
+    var curUnit = $('study-unit-sel') ? $('study-unit-sel').value : '';
+    var extra = readVocab().filter(function(w){ return w.grade===CUR_GRADE && w.unit===curUnit; });
+    extra = extra.map(function(w){ return [w.word, w.meaning, w.sent||'', w.ipa||'']; });
+    return v.length ? v : (extra.length ? extra : []);
+  }
+  function bankSents(){
+    var v = readBank('sents', CUR_VER, CUR_GRADE);
+    var curUnit = $('study-unit-sel') ? $('study-unit-sel').value : '';
+    var extra = readSent().filter(function(s){ return s.grade===CUR_GRADE && s.unit===curUnit; });
+    extra = extra.map(function(s){
+      var txt = s.sent || '';
+      if(s.blank) txt = txt.replace(new RegExp(s.blank, 'i'), '<b>' + s.blank + '</b>');
+      return [s.sent, s.meaning, txt];
+    });
+    return v.length ? v : (extra.length ? extra : []);
+  }
   loadCustomBanks();
   var CUR_BANK = WORD_BANK;
 
@@ -4125,7 +4453,9 @@
       var off = TASK_LIMIT.offset || 0;
       raw = raw.slice(off, off + (TASK_LIMIT.count - off));
     }
-    LEARN.words = raw.map(function(w){ return {word:w[0], cn:w[1], sent:w[2] || '', options:shuffle(buildOptions(w[1]))}; });
+    LEARN.words = raw.map(function(w){
+      return {word: w[0], cn: w[1], sent: w[2] || '', options: shuffle(buildOptions(w[1]))};
+    });
     LEARN.idx = 0; LEARN.total = LEARN.words.length; LEARN.wrongMap = {};
     $('rev-badge-word').textContent = '待复习 0';
     $('study-page').classList.remove('active');
@@ -4762,34 +5092,95 @@
     // 结束跟读 → 隐藏跟读按钮，先自动上传评测；「播放我的录音」等评测结果（对比读音）时再显示
     $('read-mic').style.display = 'none';
     var pl = $('read-play'); if(pl) pl.style.display = 'none';
-    // 等录音收尾生成 blob，再上传讯飞评测
+    // 等录音收尾，调用讯飞自动评测
     setTimeout(function(){
       if(READ.lastBlob){
         uploadIse();
       } else {
         $('read-result').className = 'read-result bad';
-        $('read-result').textContent = '未获取到录音，请检查麦克风权限后重试';
-        toast('未获取到录音，请检查麦克风权限', 'err');
-        playWrong();
+        $('read-result').textContent = '未获取到录音';
         startReadTimer(READ_TIME);
       }
     }, 400);
   }
-  var API_BASE = (location.protocol === 'file:') ? 'http://127.0.0.1:8000' : '';
+  // 讯飞语音评测（直连WebSocket）
+  var ISE_APPID = '6e148968';
+  var ISE_API_KEY = '19888a7034fcf1f614d345a61d5f1210';
+  var ISE_API_SECRET = 'MzI4NGQzZjFkMzA5MThmZGI3NTNhYWJj';
+  function sha256HmacB64(secret, str){
+    return crypto.subtle.importKey('raw', new TextEncoder().encode(secret), {name:'HMAC',hash:'SHA-256'}, false, ['sign'])
+      .then(function(key){ return crypto.subtle.sign('HMAC', key, new TextEncoder().encode(str)); })
+      .then(function(buf){ return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); });
+  }
+  function buildIseUrl(){
+    var host = 'ise-api.xfyun.cn', path = '/v2/open-ise';
+    var date = new Date().toUTCString();
+    var requestLine = 'GET ' + path + ' HTTP/1.1';
+    var tmp = 'host: ' + host + '\ndate: ' + date + '\n' + requestLine;
+    return sha256HmacB64(ISE_API_SECRET, tmp).then(function(sign){
+      var authOrigin = 'api_key="' + ISE_API_KEY + '", algorithm="hmac-sha256", headers="host date request-line", signature="' + sign + '"';
+      var authorization = btoa(authOrigin);
+      return 'wss://' + host + path + '?authorization=' + authorization + '&date=' + encodeURIComponent(date) + '&host=' + host;
+    });
+  }
   function uploadIse(){
     var w = READ.words[READ.idx];
     var el = $('read-result');
     el.className = 'read-result';
     el.innerHTML = '<span style="color:#8a8a8a">正在评测你的发音…</span>';
+    var category = (READ.mode === 'word' || READ.mode === 'sread') ? 'read_word' : 'read_sentence';
+    var text = w.word;
     blobToPcm16k(READ.lastBlob).then(function(pcm){
-      return fetch(API_BASE + '/api/ise', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({type: READ.mode || 'word', word: w.word, audio: arrayBufferToBase64(pcm.buffer)})
+      return buildIseUrl().then(function(url){
+        return new Promise(function(resolve, reject){
+          var ws = new WebSocket(url);
+          ws.onopen = function(){
+            var frame1 = {
+              common: {app_id: ISE_APPID},
+              business: {category: category, rstcd: 'utf8', cmd: 'ssb', auf: 'audio/L16;rate=16000', aue: 'raw', ent: 'en_vip', sub: 'ise', tte: 'utf-8', ttp_skip: true, text: '\uFEFF' + w.word},
+              data: {status: 0}
+            };
+            ws.send(JSON.stringify(frame1));
+            var bytes = new Uint8Array(pcm.buffer);
+            var chunkSize = 12000;
+            var i = 0;
+            var first = true;
+            var sendNext = function(){
+              if(i >= bytes.length){
+                ws.send(JSON.stringify({business: {cmd: 'auw', aus: 4, aue: 'raw'}, data: {status: 2, data: ''}}));
+                return;
+              }
+              var chunk = bytes.slice(i, Math.min(i + chunkSize, bytes.length));
+              var b64 = arrayBufferToBase64(chunk.buffer);
+              var aus = first ? 1 : 2;
+              ws.send(JSON.stringify({business: {cmd: 'auw', aus: aus, aue: 'raw'}, data: {status: 1, data: b64}}));
+              first = false;
+              i += chunkSize;
+              setTimeout(sendNext, 50);
+            };
+            setTimeout(sendNext, 200);
+          };
+          ws.onmessage = function(ev){
+            console.log('ISE返回:', ev.data);
+            try{
+              var j = JSON.parse(ev.data);
+              if(j.code !== 0){ reject(j.message || '评测失败 code='+j.code); ws.close(); return; }
+              if(j.data && j.data.status === 2){
+                var xml = j.data.data;
+                var m = xml.match(/<total_score[^>]*>([\d.]+)<\/total_score>/);
+                var score = m ? parseFloat(m[1]) : 0;
+                resolve(score);
+                ws.close();
+              }
+            }catch(e){ reject('解析失败: '+e.message+' raw='+ev.data.substring(0,200)); }
+          };
+          ws.onerror = function(){ reject('连接失败'); };
+          ws.ontimeout = function(){ reject('超时'); };
+          setTimeout(function(){ try{ws.close();}catch(e){} reject('超时'); }, 15000);
+        });
       });
-    }).then(function(res){ return res.json(); }).then(function(j){
-      if(j.ok && typeof j.score === 'number' && j.score >= 0) gradeScore(j.score);
-      else manualFail(j.err || '评测失败');
-    }).catch(function(){ manualFail('评测服务连接失败，请确认 server.py 已启动'); });
+    }).then(function(score){ gradeScore(score); })
+      .catch(function(err){ manualFail(typeof err === 'string' ? err : '评测失败'); });
   }
   function gradeScore(score){
     var w = READ.words[READ.idx], el = $('read-result');
@@ -4823,11 +5214,7 @@
     var pl2 = $('read-play'); if(pl2) pl2.style.display = 'inline-flex';   // 结果出来，可对比读音
     $('read-result').className = 'read-result bad';
     var msg = err || '评测失败';
-    if(hasAudio){
-      $('read-result').innerHTML = msg + '，请对比系统发音与你录音后自评<div class="read-compare"><button class="mini-btn" onclick="readReplay()">重听系统发音</button><button class="mini-btn" onclick="playReadAudio()">录音回放</button><button class="mini-btn ok" onclick="readSelfOk()">我读对了</button></div>';
-    } else {
-      $('read-result').textContent = msg;
-    }
+    $('read-result').textContent = msg;
     toast(msg, 'err');
     playWrong();
     startReadTimer(READ_TIME);
@@ -4842,33 +5229,15 @@
           var srcData = audio.getChannelData(0);
           var srcRate = audio.sampleRate;
           var n = audio.length;
-          // 源采样率下静音裁剪：定位有效语音（前后各留 200ms）
-          var frame = Math.floor(srcRate * 0.02);
-          var start = -1, end = -1;
-          for(var i = 0; i < n; i += frame){
-            var e = 0, jmax = Math.min(i + frame, n);
-            for(var j = i; j < jmax; j++){ e += srcData[j] * srcData[j]; }
-            if(Math.sqrt(e / (jmax - i)) > 0.02){
-              if(start < 0) start = i;
-              end = jmax;
-            }
-          }
-          var lead = Math.floor(srcRate * 0.2);
-          if(start >= 0 && end > start){ start = Math.max(0, start - lead); end = Math.min(n, end + lead); }
-          else { start = 0; end = n; }
+          var start = 0, end = n;
           var segLen = end - start;
-          // 只对语音段快速重采样到 16k（直接在源数据上算，不渲染整段）
           var target = 16000;
           var len = Math.max(1, Math.ceil(segLen * target / srcRate));
           var ratio = srcRate / target;
           var d = new Float32Array(len);
           for(var i = 0; i < len; i++){ d[i] = srcData[start + Math.min(segLen - 1, Math.round(i * ratio))]; }
-          // 自动增益：峰值归一化到 0.7
-          var peak = 0.0001;
-          for(i = 0; i < d.length; i++){ var a = Math.abs(d[i]); if(a > peak) peak = a; }
-          var gain = peak > 0 ? 0.7 / peak : 1;
-          var pcm = new Int16Array(d.length);
-          for(i = 0; i < d.length; i++){ var s = Math.max(-1, Math.min(1, d[i] * gain)); pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF; }
+          var pcm = new Int16Array(len);
+          for(i = 0; i < len; i++){ var s = Math.max(-1, Math.min(1, d[i])); pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF; }
           if(ctx.close) ctx.close();
           resolve(pcm);
         }).catch(reject);
