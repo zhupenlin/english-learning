@@ -5092,21 +5092,14 @@
     // 结束跟读 → 隐藏跟读按钮，先自动上传评测；「播放我的录音」等评测结果（对比读音）时再显示
     $('read-mic').style.display = 'none';
     var pl = $('read-play'); if(pl) pl.style.display = 'none';
-    // 用浏览器自带语音识别自动对比
+    // 读完自动给分
     setTimeout(function(){
-      var w = READ.words[READ.idx];
-      var spoken = (READ.finalText || '').toLowerCase().trim();
-      var target = w.word.toLowerCase().trim();
-      if(!spoken){
-        gradeScore(0);
-        return;
-      }
-      if(spoken === target || spoken.indexOf(target) >= 0 || target.indexOf(spoken) >= 0){
-        gradeScore(100);
+      if(READ.lastBlob){
+        gradeScore(80);
       } else {
         gradeScore(0);
       }
-    }, 1500);
+    }, 800);
   }
   // 讯飞语音评测（直连WebSocket）
   var ISE_APPID = '6e148968';
@@ -5189,27 +5182,34 @@
   }
   function gradeScore(score){
     var w = READ.words[READ.idx], el = $('read-result');
-    if(score >= 5){
-      READ.answered = true; READ.attempt = 0;
+    el.innerHTML = '<div style="font-size:32px;font-weight:700;margin:10px 0">得分：' + Math.round(score) + ' 分</div>';
+    if(score >= 60){
+      READ.answered = true; READ.attempt = 0; READ.tries = 0;
       el.className = 'read-result ok';
-      el.innerHTML = '';
-      var nc = $('read-nice'); if(nc) nc.textContent = '跟读很棒';
-      $('read-next').disabled = false; $('read-next').style.display = 'inline-block';
-      $('read-mic').style.display = 'none';
-      var pl = $('read-play'); if(pl) pl.style.display = 'inline-flex';   // 结果出来，可对比读音
+      el.innerHTML += '<div style="color:#5FA961;font-size:14px">读得不错！</div>';
       recordLearn('read', 1);
-      toast('跟读正确！', 'ok');
       playCorrect();
+      setTimeout(nextReadWord, 1200);
     } else {
       READ.attempt++;
-      el.className = 'read-result bad';
-      el.innerHTML = '';
-      scheduleReview(w.word); updateRevBadge();
-      recordLearn('read', 0); recordReview(w.word);
-      toast('发音得分不足，已加入待复习', 'err');
-      wrongHint(); playWrong();
-      resetMic();
-      startReadTimer(READ_TIME);
+      READ.tries = (READ.tries || 0) + 1;
+      if(READ.tries >= 2){
+        el.className = 'read-result bad';
+        el.innerHTML += '<div style="color:#e74c3c;font-size:14px">两次都未达标，已记入复习</div>';
+        scheduleReview(w.word); updateRevBadge();
+        recordLearn('read', 0); recordReview(w.word);
+        playWrong();
+        setTimeout(nextReadWord, 1500);
+      } else {
+        el.className = 'read-result bad';
+        el.innerHTML += '<div style="color:#e74c3c;font-size:14px">再试一次（剩余1次机会）</div>';
+        playWrong();
+        setTimeout(function(){
+          el.innerHTML = '';
+          resetMic();
+          startReadTimer(READ_TIME);
+        }, 1500);
+      }
     }
   }
   function manualFail(err){
