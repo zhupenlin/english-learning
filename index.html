@@ -5225,21 +5225,22 @@
       fr.onload = function(){
         var C = window.AudioContext || window.webkitAudioContext;
         var ctx = new C();
-        ctx.decodeAudioData(fr.result).then(function(audio){
-          var srcData = audio.getChannelData(0);
-          var srcRate = audio.sampleRate;
-          var n = audio.length;
-          var start = 0, end = n;
-          var segLen = end - start;
-          var target = 16000;
-          var len = Math.max(1, Math.ceil(segLen * target / srcRate));
-          var ratio = srcRate / target;
-          var d = new Float32Array(len);
-          for(var i = 0; i < len; i++){ d[i] = srcData[start + Math.min(segLen - 1, Math.round(i * ratio))]; }
-          var pcm = new Int16Array(len);
-          for(i = 0; i < len; i++){ var s = Math.max(-1, Math.min(1, d[i])); pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF; }
-          if(ctx.close) ctx.close();
-          resolve(pcm);
+        ctx.decodeAudioData(fr.result).then(function(audioBuffer){
+          var offline = new OfflineAudioContext(1, Math.ceil(audioBuffer.duration * 16000), 16000);
+          var source = offline.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(offline.destination);
+          source.start(0);
+          offline.startRendering().then(function(rendered){
+            var data = rendered.getChannelData(0);
+            var pcm = new Int16Array(data.length);
+            for(var i = 0; i < data.length; i++){
+              var s = Math.max(-1, Math.min(1, data[i]));
+              pcm[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            ctx.close();
+            resolve(pcm);
+          });
         }).catch(reject);
       };
       fr.onerror = reject;
