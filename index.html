@@ -4457,6 +4457,13 @@
       return {word: w[0], cn: w[1], sent: w[2] || '', options: shuffle(buildOptions(w[1]))};
     });
     LEARN.idx = 0; LEARN.total = LEARN.words.length; LEARN.wrongMap = {};
+    // 恢复进度
+    try{
+      var prog = JSON.parse(localStorage.getItem('learn_progress_' + MODE) || 'null');
+      if(prog && prog.idx < LEARN.words.length){
+        LEARN.idx = prog.idx;
+      }
+    }catch(e){}
     $('rev-badge-word').textContent = '待复习 0';
     $('study-page').classList.remove('active');
     $('view-word').classList.add('active');
@@ -4474,6 +4481,8 @@
   function loadWord(){
     if(LEARN.idx >= LEARN.total){ finishUnit(); return; }
     var w = LEARN.words[LEARN.idx];
+    // 保存进度
+    try{ localStorage.setItem('learn_progress_' + MODE, JSON.stringify({idx: LEARN.idx})); }catch(e){}
     LEARN.sel = -1; LEARN.answered = false; LEARN.revealed = false;
     clearInterval(LEARN.timerInt);
     $('word-en').textContent = w.word;
@@ -4930,6 +4939,13 @@
     READ.rate = 1.0;
     var rr = $('read-rate'); if(rr){ rr.value = 1.0; }
     var rt = $('read-title'); if(rt) rt.textContent = '单词读说';
+    // 恢复进度
+    try{
+      var prog = JSON.parse(localStorage.getItem('read_progress') || 'null');
+      if(prog && prog.mode === 'word' && prog.idx < READ.words.length){
+        READ.idx = prog.idx;
+      }
+    }catch(e){}
     $('study-page').classList.remove('active');
     $('view-word').classList.remove('active');
     $('view-copy').classList.remove('active');
@@ -4943,6 +4959,13 @@
     READ.rate = 1.0;
     var rr = $('read-rate'); if(rr){ rr.value = 1.0; }
     var rt = $('read-title'); if(rt) rt.textContent = '句子读说';
+    // 恢复进度
+    try{
+      var prog = JSON.parse(localStorage.getItem('read_progress') || 'null');
+      if(prog && prog.mode === 'sent' && prog.idx < READ.words.length){
+        READ.idx = prog.idx;
+      }
+    }catch(e){}
     $('study-page').classList.remove('active');
     $('view-word').classList.remove('active');
     $('view-copy').classList.remove('active');
@@ -4962,6 +4985,8 @@
     READ.answered = false; READ.attempt = 0; READ.timeLeft = READ_TIME;
     READ.lastBlob = null; READ.lastAudio = null;
     var w = READ.words[READ.idx];
+    // 保存进度
+    try{ localStorage.setItem('read_progress', JSON.stringify({mode: READ.mode, idx: READ.idx})); }catch(e){}
     $('read-en').textContent = w.word;
     // 句子模式：无音标，read-ph 显示中文释义；句子较长允许换行
     $('read-ph').textContent = READ.mode === 'sent' ? (w.cn || '') : (w.ipa || '');
@@ -5092,21 +5117,14 @@
     // 结束跟读 → 隐藏跟读按钮，先自动上传评测；「播放我的录音」等评测结果（对比读音）时再显示
     $('read-mic').style.display = 'none';
     var pl = $('read-play'); if(pl) pl.style.display = 'none';
-    // 用浏览器自带语音识别自动对比
+    // 调用讯飞自动评测打分
     setTimeout(function(){
-      var w = READ.words[READ.idx];
-      var spoken = (READ.finalText || '').toLowerCase().trim();
-      var target = w.word.toLowerCase().trim();
-      if(!spoken){
-        gradeScore(50);
-        return;
-      }
-      if(spoken === target || spoken.indexOf(target) >= 0 || target.indexOf(spoken) >= 0){
-        gradeScore(100);
+      if(READ.lastBlob){
+        uploadIse();
       } else {
-        gradeScore(40);
+        gradeScore(0);
       }
-    }, 1500);
+    }, 400);
   }
   // 讯飞语音评测（直连WebSocket）
   var ISE_APPID = '6e148968';
@@ -5134,82 +5152,75 @@
     el.className = 'read-result';
     el.innerHTML = '<span style="color:#8a8a8a">正在评测你的发音…</span>';
     var category = (READ.mode === 'word' || READ.mode === 'sread') ? 'read_word' : 'read_sentence';
-    var text = w.word;
     blobToPcm16k(READ.lastBlob).then(function(pcm){
-      return buildIseUrl().then(function(url){
-        return new Promise(function(resolve, reject){
-          var ws = new WebSocket(url);
-          ws.onopen = function(){
-            var frame1 = {
-              common: {app_id: ISE_APPID},
-              business: {category: category, rstcd: 'utf8', cmd: 'ssb', auf: 'audio/L16;rate=16000', aue: 'raw', ent: 'en_vip', sub: 'ise', tte: 'utf-8', ttp_skip: true, text: '\uFEFF' + w.word},
-              data: {status: 0}
-            };
-            ws.send(JSON.stringify(frame1));
-            var bytes = new Uint8Array(pcm.buffer);
-            var chunkSize = 12000;
-            var i = 0;
-            var first = true;
-            var sendNext = function(){
-              if(i >= bytes.length){
-                ws.send(JSON.stringify({business: {cmd: 'auw', aus: 4, aue: 'raw'}, data: {status: 2, data: ''}}));
-                return;
-              }
-              var chunk = bytes.slice(i, Math.min(i + chunkSize, bytes.length));
-              var b64 = arrayBufferToBase64(chunk.buffer);
-              var aus = first ? 1 : 2;
-              ws.send(JSON.stringify({business: {cmd: 'auw', aus: aus, aue: 'raw'}, data: {status: 1, data: b64}}));
-              first = false;
-              i += chunkSize;
-              setTimeout(sendNext, 50);
-            };
-            setTimeout(sendNext, 200);
-          };
-          ws.onmessage = function(ev){
-            console.log('ISE返回:', ev.data);
-            try{
-              var j = JSON.parse(ev.data);
-              if(j.code !== 0){ reject(j.message || '评测失败 code='+j.code); ws.close(); return; }
-              if(j.data && j.data.status === 2){
-                var xml = j.data.data;
-                var m = xml.match(/<total_score[^>]*>([\d.]+)<\/total_score>/);
-                var score = m ? parseFloat(m[1]) : 0;
-                resolve(score);
-                ws.close();
-              }
-            }catch(e){ reject('解析失败: '+e.message+' raw='+ev.data.substring(0,200)); }
-          };
-          ws.onerror = function(){ reject('连接失败'); };
-          ws.ontimeout = function(){ reject('超时'); };
-          setTimeout(function(){ try{ws.close();}catch(e){} reject('超时'); }, 15000);
-        });
+      return new Promise(function(resolve, reject){
+        fetch('/api/ise', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            word: w.word,
+            type: category === 'read_sentence' ? 'sent' : 'word',
+            audio: arrayBufferToBase64(pcm.buffer)
+          })
+        }).then(function(r){ return r.json(); }).then(function(j){
+          if(j.ok && j.score !== undefined && j.score > 0){
+            resolve(j.score);
+          } else {
+            setTimeout(function(){
+              fetch('/api/ise', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                  word: w.word,
+                  type: category === 'read_sentence' ? 'sent' : 'word',
+                  audio: arrayBufferToBase64(pcm.buffer)
+                })
+              }).then(function(r2){ return r2.json(); }).then(function(j2){
+                if(j2.ok && j2.score !== undefined && j2.score > 0){
+                  resolve(j2.score);
+                } else {
+                  reject(j2.err || '评测失败');
+                }
+              }).catch(reject);
+            }, 1000);
+          }
+        }).catch(reject);
       });
     }).then(function(score){ gradeScore(score); })
-      .catch(function(err){ manualFail(typeof err === 'string' ? err : '评测失败'); });
+      .catch(function(err){
+        $('read-result').className = 'read-result bad';
+        $('read-result').innerHTML = '<div style="color:#e74c3c;font-size:14px;margin-bottom:10px">评测失败：' + (err || '未知错误') + '</div><button class="mini-btn ok" onclick="retryRead()">再试一次</button>';
+      });
+  }
+  function retryRead(){
+    $('read-result').innerHTML = '';
+    resetMic();
+    startReadTimer(READ_TIME);
   }
   function gradeScore(score){
     var w = READ.words[READ.idx], el = $('read-result');
-    el.innerHTML = '<div style="font-size:32px;font-weight:700;margin:10px 0">得分：' + Math.round(score) + ' 分</div>';
-    if(score >= 60){
+    READ.scores = READ.scores || [];
+    READ.scores.push(score);
+    el.innerHTML = '<div style="font-size:32px;font-weight:700;margin:10px 0">得分：' + score.toFixed(1) + ' / 5</div>';
+    if(score >= 3.5){
       READ.answered = true; READ.attempt = 0; READ.tries = 0;
       el.className = 'read-result ok';
       el.innerHTML += '<div style="color:#5FA961;font-size:14px">读得不错！</div>';
       recordLearn('read', 1);
       playCorrect();
-      setTimeout(nextReadWord, 1200);
+      setTimeout(readNext, 1200);
     } else {
-      READ.attempt++;
       READ.tries = (READ.tries || 0) + 1;
-      if(READ.tries >= 2){
+      if(READ.tries >= 3){
         el.className = 'read-result bad';
-        el.innerHTML += '<div style="color:#e74c3c;font-size:14px">两次都未达标，已记入复习</div>';
+        el.innerHTML += '<div style="color:#e74c3c;font-size:14px">3次都未达标，已记入复习</div>';
+        el.innerHTML += '<button class="mini-btn ok" onclick="readNext()" style="margin-top:10px">下一个</button>';
         scheduleReview(w.word); updateRevBadge();
         recordLearn('read', 0); recordReview(w.word);
         playWrong();
-        setTimeout(nextReadWord, 1500);
       } else {
         el.className = 'read-result bad';
-        el.innerHTML += '<div style="color:#e74c3c;font-size:14px">再试一次（剩余1次机会）</div>';
+        el.innerHTML += '<div style="color:#e74c3c;font-size:14px">再试一次（剩余' + (3 - READ.tries) + '次机会）</div>';
         playWrong();
         setTimeout(function(){
           el.innerHTML = '';
@@ -5331,7 +5342,13 @@
   function readNext(){
     if(!READ.answered) return;
     READ.idx++;
-    if(READ.idx >= READ.words.length){ READ.idx = 0; toast('本单元跟读完成！', 'ok'); }
+    if(READ.idx >= READ.words.length){
+      var total = READ.scores || [], avg = total.length ? (total.reduce(function(a,b){return a+b;},0)/total.length) : 0;
+      var pass = avg >= 3.5;
+      $('read-result').innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:24px;font-weight:700;margin-bottom:10px">单元测试完成</div><div style="font-size:18px;margin-bottom:10px">平均分：' + avg.toFixed(1) + ' / 5</div>' + (pass ? '<div style="color:#5FA961;font-size:16px">恭喜通过！</div>' : '<div style="color:#e74c3c;font-size:16px">未通过，再练一遍</div>') + '<div style="margin-top:20px"><button class="mini-btn ok" onclick="backHome()">返回</button> <button class="mini-btn" onclick="READ.idx=0;READ.scores=[];showRead()">重练</button></div></div>';
+      READ.idx = 0;
+      return;
+    }
     showRead();
   }
   document.addEventListener('keydown', function(ev){
@@ -5372,6 +5389,13 @@
       return { word:w[0], cn:w[1], sent:w[2] || '', form:form || w[0], options:shuffle(buildOptions(w[1])) };
     });
     LEARN.idx = 0; LEARN.total = LEARN.words.length; LEARN.wrongMap = {};
+    // 恢复进度
+    try{
+      var prog = JSON.parse(localStorage.getItem('copy_progress_' + (isSent ? 'sent' : 'word')) || 'null');
+      if(prog && prog.idx < LEARN.words.length){
+        LEARN.idx = prog.idx;
+      }
+    }catch(e){}
     $('copy-title').textContent = isSent ? '句子抄默' : '单词抄默';
     $('rev-badge-copy').textContent = '待复习 0';
     $('study-page').classList.remove('active');
@@ -5392,6 +5416,8 @@
   function loadCopyWord(){
     if(LEARN.idx >= LEARN.total){ finishUnit(); return; }
     var w = LEARN.words[LEARN.idx];
+    // 保存进度
+    try{ localStorage.setItem('copy_progress_' + (COPY.isSent ? 'sent' : 'word'), JSON.stringify({idx: LEARN.idx})); }catch(e){}
     COPY.stage = COPY.isSent ? 'fill' : 'spell';
     COPY.answered = false; COPY.revealed = false; COPY.errored = false; COPY.wrongStreak = 0;
     COPY.copyMode = false; COPY.lettersRevealed = 0;
